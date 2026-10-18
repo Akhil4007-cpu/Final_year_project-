@@ -23,7 +23,15 @@ Project-wide, plain-spoken limits of RoadGuard AI. ML-specific limits are in
   polylines can make sections unscorable; that returns `insufficient_evidence`, never a
   zero ("no data" ≠ "safe", R5).
 - **Speed/grade/road-class are advisory bands or missing-flagged assumptions**, not
-  measured or legal values.
+  measured or legal values. Since TASK 2 the rider's *device-reported* ground speed
+  (`coords.speed`) is read during navigation and compared against the band the advisory
+  was scored at, using the same `v²/R` physics as the baseline; the result is shown as a
+  lateral-demand comparison in g. It changes the **note**, not the **score** — scoring
+  still uses the caller-supplied or assumed band (`speed_source` in every payload),
+  because re-scoring mid-route on an unvalidated live signal would move the number the
+  evaluation is pinned to. Most desktop browsers and many phones report `speed: null`, in
+  which case the note states that no speed was measured and that the assumed band was
+  used. No speed advice ("ride at X") is ever produced (R4).
 
 ## Scope of what is covered
 

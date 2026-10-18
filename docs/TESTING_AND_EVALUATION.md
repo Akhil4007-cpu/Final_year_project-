@@ -8,18 +8,19 @@ described as a live one (rule of the plan §12).
 
 ```
 $ python -m pytest -q
-........................................................................ [ 68%]
-.....................................................................  [100%]
-105 passed, 1 warning in 10.15s
+........................................................................ [ 66%]
+....................................                                     [100%]
+108 passed, 1 warning in 8.23s
 ```
 
 (The single warning is a Starlette/httpx deprecation notice from `TestClient` itself, not
-from project code. Earlier baseline was 91; the current suite is 105.)
+from project code. Earlier baselines were 91, then 105; the current suite is 108 — the +3
+are the TASK-2 wiring tests for the speed-aware advisory and route deviation.)
 
 Environment: Python 3.10.10, pytest 8.3.2, fastapi.testclient `TestClient` (used as a
 context manager so the app lifespan — DB migration + artifact load — runs).
 
-## Per-module breakdown (`--collect-only`, 105 backend total)
+## Per-module breakdown (`--collect-only`, 108 backend total)
 
 | File | Tests | Covers | Level |
 |---|---|---|---|
@@ -31,7 +32,7 @@ context manager so the app lifespan — DB migration + artifact load — runs).
 | `tests/test_model.py` | 13 | missing/corrupt artifact, feature-schema mismatch rejection, synthetic_training flag, model_estimate vs baseline_fallback (>20 disagreement), conformal OOD widening, predict raises when unavailable, residual prior correction, legacy direct score, **batch-vs-per-section `score_sections` equivalence (row-order sensitive)** | Unit/Integration |
 | `tests/test_api.py` | 18 | health/meta, register requires CSRF header (403), register/login/me, duplicate 400, weak pw 400, wrong pw 401, cookie HttpOnly+SameSite=lax, hazard auth gate + unverified default, admin role gate (403)/anonymous (401), moderate+audit `hazard_verified`, self-deactivate blocked, logout, login rate limit → 429 + Retry-After | Integration |
 | `tests/test_api_routes.py` | 6 | **`POST /routes/analyze` with a MOCKED provider (`mock`-labelled, offline):** scored 2-route response + advisories + provider/model provenance, R4 disclaimer / no "safe route", provider 503 → `provider_unavailable`, OSRM NoRoute → `insufficient_evidence` (never invents a route), missing client header → 403, out-of-range coords → validation reject | Integration |
-| `tests/test_web_alerts.py` | 4 | static wiring of the staged-alert + settings feature in `app/web/` (vibration/WebAudio/webkit + cue de-dup key + reduced-motion + localStorage load + assertive live region + disclaimer copy) | Static |
+| `tests/test_web_alerts.py` | 7 | static wiring of the staged-alert + settings feature in `app/web/` (vibration/WebAudio/webkit + cue de-dup key + reduced-motion + localStorage load + assertive live region + disclaimer copy), **speed-aware advisory wiring (`speedAwareness`/`lateralDemandG`/`coords.speed`/`#advisory-speed`)**, **the speed note's banned-wording audit (no speed instruction)**, **route-deviation wiring (deviation counter, `route_deviation` chip state, accuracy-scaled threshold, `#router-note`)** | Static |
 | `tests/test_compliance.py` | 7 | R2 grep, R4 phrase audit, "accident probability" only negated, R10 import graph, R8 secret scan, R3/R5 error codes, R7 assumptions | Static/Compliance |
 | `tests/test_db_backup.py` | 1 | populate→`backup_database`→restore loses 0 rows, `PRAGMA integrity_check` ok, restored DB still enforces role gate + returns verified hazard | Integration |
 
@@ -73,13 +74,19 @@ the test was.
   about the wiring's presence in the shipped frontend.
 - **Automated Playwright E2E: PRESENT.** `tests/e2e/` (`rider.spec.js`, `admin.spec.js`,
   `_harness.js`) boots the **real ASGI app** via the `playwright.config.js` `webServer` and
-  drives both SPAs in headless Chromium. **12 cases green** (`npx playwright test` →
-  `12 passed`). **Rider (7):** startup (shell + GPS chip + search, no uncaught JS errors),
+  drives both SPAs in headless Chromium. **15 cases green** (`npx playwright test` →
+  `15 passed`). **Rider (10):** startup (shell + GPS chip + search, no uncaught JS errors),
   search→route (scored panel, provider provenance, and the browser actually sending the
   `X-RoadGuard-Client: web` header on the analyze POST), navigation lifecycle (start →
   destination-reached → trip summary), live-GPS→staged advisory cue (banner `data-band=high` +
   the assertive `role=alert` region populated), hazard submit (unverified toast),
-  insufficient-evidence (never invents a route), provider-failure (graceful unavailable state).
+  insufficient-evidence (never invents a route), provider-failure (graceful unavailable state),
+  **route deviation (F14): two off-polyline fixes → advisories pause + `route_deviation` chip +
+  `#router-note`, and the on-route fix clears it**, **speed-aware note: a 90 km/h device speed
+  against the 45 km/h scored band renders `data-status="above"` with the g figure**, and
+  **the no-speed fallback: `speed: null` renders `data-status="speed_unavailable"` and says the
+  band was assumed**. The last case is what caught a real bug — `Number(coords.speed)` coerces
+  `null` to `0`, which would have displayed "0 km/h measured" instead of disclosing the absence.
   **Admin (5):** signed-out boot → login gate → admin login reveals console (login POST carries
   the client header), non-admin role is denied the console, tab switching shows only the selected
   panel and renders the hazards list, moderation posts `{action:"verify", note}` + shows the

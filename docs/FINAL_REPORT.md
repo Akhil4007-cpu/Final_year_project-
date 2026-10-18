@@ -125,9 +125,9 @@ probability" appears only in negations and never "safe route".
 
 ## 13. Test commands + results
 ```
-python -m pytest -q                 → 105 passed, 1 warning (Starlette/TestClient deprecation)
-node --test "tests/js/**/*.test.js" → pass 23, fail 0
-npx playwright test                 → 12 passed (7 rider + 5 admin) — all providers MOCKED (`mock`)
+python -m pytest -q                 → 108 passed, 1 warning (Starlette/TestClient deprecation)
+node --test "tests/js/**/*.test.js" → tests 31, pass 31, fail 0
+npx playwright test                 → 15 passed (10 rider + 5 admin) — all providers MOCKED (`mock`)
 python -m ruff check app ml scripts tests                      → All checks passed!
 python -m mypy app ml scripts --ignore-missing-imports         → Success: no issues found in 29 files
 python -m pip_audit -r requirements.txt                        → 0 known vulnerabilities
@@ -138,7 +138,9 @@ Playwright E2E (`tests/e2e`) boots the real ASGI app via the config `webServer`;
 response is mocked and labelled `mock`; OSM tiles stubbed. Rider: startup (no JS errors),
 search→route (+ client header `web` asserted on the POST), nav lifecycle → trip summary, live-GPS
 → staged advisory cue with assertive escalation, hazard submit (unverified toast),
-insufficient-evidence (never invents a route), provider-failure (graceful unavailable). Admin:
+insufficient-evidence (never invents a route), provider-failure (graceful unavailable), **route deviation
+latch + recovery (F14)**, **speed-aware lateral-demand note when the device reports a speed**, and
+**the disclosed fallback when it does not**. Admin:
 login gate, role-denied gate, tab switch + hazards list, moderation posts `{action:"verify", note}`
 + `verified.` toast, system/diagnostics render. Detail: [TESTING_AND_EVALUATION.md](TESTING_AND_EVALUATION.md).
 
@@ -175,7 +177,7 @@ advisory is geometry-only (no surface condition, traffic, weather). See
 - [x] Rules R1–R11: R2/R4/R8/R10 automated in `test_compliance` (7 green); rest documented, no
   accident-prediction claim anywhere.
 - [x] ML pipeline present, reproducible, honestly evaluated; no accident claim.
-- [x] Full test suite green (105 + 23 + 12), or documented: none failing.
+- [x] Full test suite green (108 + 31 + 15), or documented: none failing.
 - [~] "Clean-machine deploy works; CI green": commands verified locally except `docker build`
   (deferred) and runner execution (impossible here) — documented, not asserted.
 - [x] Docs match code; references verified (11, dated).

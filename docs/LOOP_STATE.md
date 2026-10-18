@@ -24,7 +24,7 @@ FINAL_REPORT §16).
 | 8 ML integration | Done | startup load, uncertainty, disagreement fallback, admin status, provenance tags, import-graph test. `app/model.py` adds the prior back for `prediction_mode=…residual`; legacy artifacts still load. New residual runtime covered by `tests/test_model.py` (incl. a batch-vs-per-section equivalence guard); the scored route path is now also covered end-to-end by `tests/test_api_routes.py`. |
 | 9 Hazards/admin/privacy/security | Mostly done | lifecycle/authz/secret-scan/deletion tested; **`pip-audit` now RUN clean** (0 known vulns, live DB). Graceful-failure provider mocks now in CI (`tests/test_api_routes.py`); remaining: in-suite `live`-labelled pytest (network-gated). |
 | 10 Performance | **Measured + optimised** | server path batched (`score_sections`): analyze p50 ~90→16 ms, single-worker ~8→66 rps, **provably lossless** (0 mismatches on real model + `test_score_sections_batch_matches_per_section`); bounded provider cache (cold→warm skip re-fetch, ≤256 entries); **live** provider p50 geocode 21 ms / route 204 ms; **client** 0.024 ms/fix, flat heap + 0 listener growth over soak, 0 duplicate GPS subs (browser-verified). Open: multi-worker + CI-Playwright perf variants. Evidence: `PERFORMANCE_REPORT.md`, `docs/perf_server_bench.json`, `docs/perf_provider_live.json`. |
-| 11 Regression | Mostly done | **105 backend + 23 `node --test` + 12 Playwright E2E cases green (rider + admin; E2E covers nav-FSM, cue playback, trip summary, login/role gating, tab switch, moderation, and insufficient-evidence + provider-failure paths with `mock`-labelled providers; backend `tests/test_api_routes.py` covers `/routes/analyze` offline). `ruff` clean; `mypy` clean on app+ml+scripts (29 files, findings fixed in source, not suppressed); `pip-audit` clean.** Open: `pyright` (mypy is authoritative; not run) + an in-suite `live`-labelled provider pytest (network egress out of CI). |
+| 11 Regression | Mostly done | **108 backend + 31 `node --test` + 15 Playwright E2E cases green (rider + admin; E2E covers nav-FSM, **route deviation (F14)**, **speed-aware advisory note + no-speed fallback**, cue playback, trip summary, login/role gating, tab switch, moderation, and insufficient-evidence + provider-failure paths with `mock`-labelled providers; backend `tests/test_api_routes.py` covers `/routes/analyze` offline). `ruff` clean; `mypy` clean on app+ml+scripts (29 files, findings fixed in source, not suppressed); `pip-audit` clean.** Open: `pyright` (mypy is authoritative; not run) + an in-suite `live`-labelled provider pytest (network egress out of CI). |
 | 12 Docs + Review 2 | Mostly done | §11 docs written; REVIEW_2_PROJECT_SPECIFICATION filled with `REQUIRES STUDENT INPUT` rows kept blank. |
 | 13 Deployment | Partial | `Dockerfile` + `.dockerignore` + CI workflow + runbook authored; CI **lint/mypy/pip-audit flipped to blocking, a `frontend-test` (node) job, and a `e2e` (Playwright, Chromium, mock-labelled) job added** (build now `needs: [test, e2e]`); **`docker build` verification deferred by student request** (Docker Desktop is installed but the engine isn't running here and the student asked to skip it — KNOWN_ISSUES #11) and no GH runner has executed the workflow yet. |
 
@@ -94,6 +94,40 @@ verified by unit tests + wiring, not a live headless-GPS run. See
 ## Gate log (actual command output, most recent first)
 
 Full gate re-run after every task in this session. Commands are exactly as listed in README.
+
+### TASK 2 — speed-aware advisory + deviation coverage (2026-10-17)
+
+| Command | Actual output |
+|---|---|
+| `python -m pytest -q` | `108 passed, 1 warning in 8.23s` (was 105; +3 wiring tests) |
+| `node --test "tests/js/**/*.test.js"` | `tests 31 / pass 31 / fail 0` (was 23; +8 speed cases) |
+| `npx playwright test` | `15 passed (12.2s)` — 10 rider + 5 admin (was 12; +3) |
+| `python -m ruff check app ml scripts tests` | `All checks passed!` |
+| `python -m mypy app ml scripts --ignore-missing-imports` | `Success: no issues found in 29 source files` |
+| `python -m pip_audit -r requirements.txt` | `No known vulnerabilities found` |
+| `python -m pytest tests/test_compliance.py -q` | `7 passed, 1 warning in 0.07s` |
+
+**Gap report that drove this task.** (a) F14 route-deviation was already implemented in
+`app/web/app.js` (accuracy-scaled cross-track threshold, 2-fix latch, `route_deviation` chip
+state, advisory pause, recovery) but had **zero** automated coverage — `grep -rn deviat tests/`
+returned nothing. (b) The advisory did **not** use the rider's real GPS speed: `speed_kmh` came
+only from the manual `#speed-select`, falling back to a road-class assumption server-side, and
+`coords.speed` was never read anywhere in the client.
+
+**Implemented.** `speedAwareness()` / `lateralDemandG()` / `normaliseSpeedKmh()` in
+`app/web/alerts.js` (pure, node-tested) re-evaluate `v²/R` in g at the device's reported speed
+and compare it against the band the advisory was actually scored at (`inputs.speed_kmh` from the
+payload), on the section's mapped radius. `onFix` now stores `speed_kmh`; `updateAdvisory`
+renders the note into `#advisory-speed` with `data-status` ∈ above/below/matching/
+speed_unavailable/radius_unavailable; the technical detail view reports the live-speed source.
+Invalid or missing speed **falls back to the assumed band and says so** — it never renders as
+0 km/h. No instruction about what speed to ride at is produced anywhere (asserted by
+`test_speed_note_is_a_disclosure_not_an_instruction`). Scores/MAE are unchanged: the note is a
+display layer, so all §7.5 evaluation numbers still refer to the same banded scoring.
+
+**Real bug the new tests caught:** `Number(coords.speed)` coerces `null` → `0`, so an
+unreported speed would have displayed "0 km/h (GPS)" and a 0.00 g demand. Fixed in source
+(`app/web/app.js` `onFix`) by testing for absent speed first, not by weakening the test.
 
 ### TASK 1 — version control (2026-10-17)
 

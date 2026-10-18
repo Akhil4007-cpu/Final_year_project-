@@ -22,7 +22,7 @@ import {
   setMessage,
   showToast,
 } from "./ui.js";
-import { alertStage, detectCapabilities, planAlert } from "./alerts.js";
+import { alertStage, detectCapabilities, planAlert, speedAwareness } from "./alerts.js";
 import { DEFAULT_SETTINGS, loadSettings, normalizeSettings, saveSettings } from "./settings.js";
 
 const GPS_TEXT = {
@@ -65,6 +65,7 @@ const dom = {
   advisoryBanner: $("#advisory-banner"),
   advisoryTitle: $("#advisory-title"),
   advisoryText: $("#advisory-text"),
+  advisorySpeed: $("#advisory-speed"),
   advisoryDismiss: $("#advisory-dismiss"),
   navHud: $("#nav-hud"),
   navInstruction: $("#nav-instruction"),
@@ -323,7 +324,12 @@ function onFix(position) {
     }
   }
   state.gps.rejections = 0;
-  const fix = { lat, lon, accuracy, timestamp };
+  // `coords.speed` is m/s above ground when the device reports it; most browsers
+  // report null on desktop and many phones. Number(null) is 0, so test for the
+  // absent value first — an unreported speed must never look like 0 km/h.
+  const rawSpeed = coords.speed === null || coords.speed === undefined ? Number.NaN : Number(coords.speed);
+  const speedKmh = Number.isFinite(rawSpeed) && rawSpeed >= 0 ? rawSpeed * 3.6 : null;
+  const fix = { lat, lon, accuracy, timestamp, speed_kmh: speedKmh };
   state.gps.lastFix = fix;
   setGpsStatus(accuracy > 100 ? "gps_uncertain" : "ready");
   updateUserMarker(fix);
@@ -865,6 +871,7 @@ function updateAdvisory(route, progress) {
   dom.advisoryText.textContent = ahead
     ? `About ${formatDistance(candidate.start_distance_m - progress)} ahead. Advisory only; based on mapped road shape.`
     : "You are in this curve. Advisory only; based on mapped road shape.";
+  renderSpeedNote(route, candidate);
   const stage = alertStage(ahead);
   const key = `${candidate.id}:${stage}`;
   const isNewAdvisory = nav.currentAdvisoryId !== candidate.id;
@@ -949,9 +956,42 @@ function unlockAudio() {
   state.audioUnlocked = true;
 }
 
+function liveSpeedText() {
+  const fix = usableFix();
+  if (!fix || fix.speed_kmh === null || fix.speed_kmh === undefined) {
+    return "Not reported by this device — advisories use the assumed band and say so";
+  }
+  return `~${Math.round(fix.speed_kmh)} km/h reported by the device (advisory comparison only)`;
+}
+
+// Compare the rider's measured GPS speed with the speed band the advisory was// scored at, using the same a = v²/R physics as the baseline. When the device does
+// not report a speed this falls back to an explicit disclosure — never a silent
+// reuse of the assumed band. The note never tells the rider what speed to ride at
+// (master plan R4).
+function renderSpeedNote(route, advisory) {
+  if (!dom.advisorySpeed) return;
+  const fix = usableFix();
+  const section = (route.sections || []).find((item) => item.index === advisory.section_index);
+  const radius = section ? section.min_radius_m || section.radius_m : null;
+  const inputs = state.routeData ? state.routeData.inputs : null;
+  const note = speedAwareness({
+    speed_kmh: fix ? fix.speed_kmh : null,
+    radius_m: radius,
+    scored_speed_kmh: inputs ? inputs.speed_kmh : null,
+  });
+  dom.advisorySpeed.textContent = note.message;
+  dom.advisorySpeed.dataset.status = note.status;
+  dom.advisorySpeed.hidden = false;
+}
+
 function hideAdvisory() {
   dom.advisoryBanner.hidden = true;
   dom.advisoryBanner.dataset.intensity = "";
+  if (dom.advisorySpeed) {
+    dom.advisorySpeed.hidden = true;
+    dom.advisorySpeed.textContent = "";
+    dom.advisorySpeed.dataset.status = "";
+  }
   state.advisoryActive = false;
   if (state.nav) {
     state.nav.currentAdvisoryId = null;
@@ -1117,6 +1157,10 @@ function renderDetail() {
         ["Road class", data.inputs.road_class_supplied ? "Supplied" : "Unavailable; class code marked missing"],
         ["Grade", data.inputs.grade_supplied ? "Supplied" : "Unavailable; never inferred from a polyline"],
         ["Scoring distance", data.inputs.scoring_distance_basis],
+        [
+          "Live GPS speed",
+          liveSpeedText(),
+        ],
       ]),
       assumptionList(data.assumptions),
       createElement("p", { className: "hint", text: data.disclaimer }),

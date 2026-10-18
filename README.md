@@ -74,9 +74,9 @@ hash `5e92447a…d5db9d`). See [ml/artifacts/REPRODUCE.md](../ml/artifacts/REPRO
 ## Test
 
 ```bash
-python -m pytest -q                 # 105 backend tests
-node --test "tests/js/**/*.test.js" # 23 frontend unit tests (no build step, Node ≥ 22)
-npx playwright test                 # 12 rider+admin E2E cases (mock-labelled providers; boots the real ASGI app)
+python -m pytest -q                 # 108 backend tests
+node --test "tests/js/**/*.test.js" # 31 frontend unit tests (no build step, Node ≥ 22)
+npx playwright test                 # 15 rider+admin E2E cases (mock-labelled providers; boots the real ASGI app)
 python -m ruff check app ml scripts tests        # clean
 python -m mypy app ml scripts --ignore-missing-imports  # clean (29 files)
 python -m pip_audit -r requirements.txt          # no known vulnerabilities
@@ -86,10 +86,10 @@ python scripts/bench_provider_live.py --confirm  # OPT-IN live Nominatim/OSRM ro
 
 Backend: geometry, baseline, aggregation, advisory, security, model, API, DB backup/restore,
 compliance, staged-alert wiring. Frontend unit tests (`tests/js`) cover the pure alert
-planner + settings persistence. **Playwright E2E** (`tests/e2e`, `npx playwright test`) drives
+planner + speed-aware advisory note + settings persistence. **Playwright E2E** (`tests/e2e`, `npx playwright test`) drives
 the rider nav state machine, cue playback, trip summary and the insufficient-evidence /
 provider-failure paths, plus the admin console's login/role gating, tab switching, moderation
-and diagnostics — all against the real app with **`mock`-labelled providers** (12 cases); first
+and diagnostics — all against the real app with **`mock`-labelled providers** (15 cases); first
 run needs `npm ci && npx playwright install chromium`. **`ruff`, `mypy`, and `pip-audit` are run
 clean and are CI-blocking.** Performance is measured (server before/after, live provider, client
 render/soak — see [docs/PERFORMANCE_REPORT.md](docs/PERFORMANCE_REPORT.md)). Remaining: a live

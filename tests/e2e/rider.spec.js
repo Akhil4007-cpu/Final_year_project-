@@ -140,3 +140,71 @@ test("provider failure → graceful unavailable state, no crash", async ({ page 
   await expect(page.locator("#search-input")).toBeVisible();
   expect(errors).toEqual([]);
 });
+
+// F14 — route-deviation detection. Two consecutive fixes off the analysed polyline
+// (beyond the accuracy-scaled threshold) must pause advisories and say so; returning
+// to the route must clear the state.
+test("route deviation → advisories pause, chip shows off-route, recovery clears it", async ({ page }) => {
+  await openApp(page, { advisoryBand: "high" });
+  await page.click("#locate-button");
+  await page.evaluate(([lat, lon]) => window.__feedFix(lat, lon, 10), PTS[1]);
+  await page.fill("#search-input", "Charminar");
+  await page.click("#search-submit");
+  await page.click("#search-results .result-button");
+  await expect(page.locator("#start-nav")).toBeEnabled();
+  await page.click("#start-nav");
+  await expect(page.locator("#nav-hud")).toBeVisible();
+
+  // ~211 m offset in longitude (the polyline runs north–south, so a latitude offset
+  // would land on an existing vertex), fed twice → deviation latches.
+  const offRoute = [PTS[1][0], PTS[1][1] + 0.002];
+  await page.evaluate((p) => window.__feedFix(p[0], p[1], 10), offRoute);
+  await page.evaluate((p) => window.__feedFix(p[0], p[1], 10, 1000), offRoute);
+  await expect(page.locator("#router-note")).toBeVisible();
+  await expect(page.locator("#router-note-text")).toContainText("Off the analysed route");
+  await expect(page.locator("#gps-chip")).toHaveAttribute("data-state", "route_deviation");
+  await expect(page.locator("#advisory-banner")).toBeHidden();
+
+  // Back on the route → note cleared, navigation HUD returns. The 8 s gap keeps the
+  // hop inside the app's 75 m/s implausible-jump gate.
+  await page.evaluate((p) => window.__feedFix(p[0], p[1], 10, 8000), PTS[2]);
+  await expect(page.locator("#router-note")).toBeHidden();
+  await expect(page.locator("#nav-hud")).toBeVisible();
+  await expect(page.locator("#gps-chip")).not.toHaveAttribute("data-state", "route_deviation");
+});
+
+// Speed-aware advisory: the note compares the device's measured ground speed against
+// the band the score was computed at (mock inputs.speed_kmh = 45).
+test("measured GPS speed above the scored band adds a lateral-demand note to the advisory", async ({ page }) => {
+  await openApp(page, { advisoryBand: "high" });
+  await page.click("#locate-button");
+  const curve = PTS[3];
+  await page.evaluate(([lat, lon]) => window.__feedFix(lat, lon, 8, 0, 90), curve);
+  await page.fill("#search-input", "Charminar");
+  await page.click("#search-submit");
+  await page.click("#search-results .result-button");
+  await page.click("#start-nav");
+  const speedNote = page.locator("#advisory-speed");
+  await expect(speedNote).toBeVisible();
+  await expect(speedNote).toHaveAttribute("data-status", "above");
+  await expect(speedNote).toContainText("90 km/h");
+  await expect(speedNote).toContainText("g lateral");
+  // Never a "safe speed" style instruction.
+  await expect(speedNote).not.toContainText("safe");
+});
+
+// Invalid/missing speed must fall back to the assumed band and disclose that.
+test("device reports no speed → advisory discloses it stayed on the assumed band", async ({ page }) => {
+  await openApp(page, { advisoryBand: "high" });
+  await page.click("#locate-button");
+  const curve = PTS[3];
+  await page.evaluate(([lat, lon]) => window.__feedFix(lat, lon, 8), curve);
+  await page.fill("#search-input", "Charminar");
+  await page.click("#search-submit");
+  await page.click("#search-results .result-button");
+  await page.click("#start-nav");
+  const speedNote = page.locator("#advisory-speed");
+  await expect(speedNote).toBeVisible();
+  await expect(speedNote).toHaveAttribute("data-status", "speed_unavailable");
+  await expect(speedNote).toContainText("not measured");
+});

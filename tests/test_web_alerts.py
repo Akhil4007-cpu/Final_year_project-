@@ -63,3 +63,44 @@ def test_settings_copy_is_advisory_not_accident_claim():
     assert "not an accident warning" in html
     assert "safe route" not in html
     assert "prevents accidents" not in html
+
+
+def test_speed_aware_advisory_is_wired():
+    """TASK 2: the advisory must compare the device's measured ground speed."""
+    alerts = _read("alerts.js")
+    app = _read("app.js")
+    html = _read("index.html")
+    assert "export function speedAwareness" in alerts
+    assert "export function lateralDemandG" in alerts
+    assert "export function normaliseSpeedKmh" in alerts
+    # the same v²/R physics as the backend baseline, expressed in g
+    assert "STANDARD_GRAVITY" in alerts
+    # client captures coords.speed and renders the note inside the advisory banner
+    assert "coords.speed" in app
+    assert "speedAwareness({" in app
+    assert 'id="advisory-speed"' in html
+    # an absent speed must never read as 0 km/h
+    assert "coords.speed === null || coords.speed === undefined" in app
+
+
+def test_speed_note_is_a_disclosure_not_an_instruction():
+    """No 'safe speed'/speed-limit wording; the fallback has to be explicit."""
+    alerts = _read("alerts.js").lower()
+    app = _read("app.js").lower()
+    for phrase in ("safe speed", "speed limit", "recommended speed", "you can safely"):
+        assert phrase not in alerts
+        assert phrase not in app
+    assert "speed_unavailable" in alerts
+    assert "radius_unavailable" in alerts
+
+
+def test_route_deviation_detection_is_wired():
+    """TASK 2 (F14): deviation was implemented but had no automated coverage."""
+    app = _read("app.js")
+    html = _read("index.html")
+    assert "nav.deviations" in app
+    assert "route_deviation" in app
+    assert "Off the analysed route" in app
+    assert 'id="router-note"' in html
+    # threshold scales with reported accuracy and is clamped
+    assert "Math.max(55, Math.min(120, fix.accuracy * 1.6))" in app

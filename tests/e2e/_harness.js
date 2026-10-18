@@ -269,7 +269,7 @@ export async function installGeolocation(context) {
         };
       },
     });
-    window.__feedFix = (lat, lon, accuracy = 10, advanceMs = 0) => {
+    window.__feedFix = (lat, lon, accuracy = 10, advanceMs = 0, speedKmh = null) => {
       sim.t += advanceMs;
       const position = {
         coords: {
@@ -279,7 +279,8 @@ export async function installGeolocation(context) {
           altitude: null,
           altitudeAccuracy: null,
           heading: null,
-          speed: null,
+          // GeolocationCoordinates.speed is m/s above ground; null = not measured.
+          speed: Number.isFinite(speedKmh) ? speedKmh / 3.6 : null,
         },
         timestamp: sim.t,
       };
