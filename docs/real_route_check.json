@@ -1,0 +1,603 @@
+{
+  "label": "live",
+  "kind": "plausibility check only \u2014 NOT an accuracy test",
+  "measured_at_utc": "2026-10-18T05:37:43Z",
+  "providers": {
+    "nominatim": "https://nominatim.openstreetmap.org",
+    "osrm": "https://router.project-osrm.org",
+    "user_agent": "RoadGuardAI/0.1 (student project)"
+  },
+  "model_artifact": "D:\\FP_ROADGUARD\\ml\\artifacts\\model.joblib",
+  "pair_count": 5,
+  "aggregate": {
+    "route_records": 8,
+    "pairs_with_a_route": 5,
+    "sections_total": 1247,
+    "sections_scored": 1176,
+    "scored_share": 0.9431,
+    "baseline_fallback_sections": 182,
+    "fallback_rate_over_scored": 0.1548,
+    "ood_sections": 216,
+    "advisories": 162,
+    "coverage_min": 0.9568,
+    "coverage_max": 0.9831,
+    "radius_sections": 987,
+    "radius_under_10m": 15,
+    "radius_under_25m": 84,
+    "smallest_radius_m": 3.96,
+    "high_band_sections": 143,
+    "high_band_and_radius_under_25m": 84,
+    "states": {
+      "scored": 8
+    }
+  },
+  "note": "PLAUSIBILITY CHECK ONLY \u2014 no ground truth exists for these routes, so no accuracy, error or safety claim is made or implied. Scores are the geometry-challenge indicator computed from OpenStreetMap way geometry via OSRM; agreement with real riding conditions is untested. Speed is the assumed advisory band, not measured. Providers are the public OSRM demo and Nominatim instances, paced at >=1.1 s per request.",
+  "results": [
+    {
+      "origin_query": "Charminar, Hyderabad",
+      "destination_query": "Secunderabad Railway Station, Hyderabad",
+      "origin": {
+        "display_name": "Charminar, Charminar Circle, Laad Bazaar, Khilwat, Ward 49 Ghansi Bazar, Greater Hyderabad Municipal Corporation South Zone, Hyderabad, Bahadurpura mandal, Hyderabad, Telangana, 500002, India",
+        "lat": 17.3616024,
+        "lon": 78.4746421
+      },
+      "destination": {
+        "display_name": "Secunderabad Junction, Regimental Bazar Main Road, Marredpally mandal, Secunderabad, Hyderabad, Telangana, 500003, India",
+        "lat": 17.4338591,
+        "lon": 78.502051
+      },
+      "provider": {
+        "name": "osrm",
+        "attribution": "Routing by OSRM; map data \u00a9 OpenStreetMap contributors (ODbL)",
+        "fetched_at": "2026-10-18T05:37:30+00:00",
+        "cached": false
+      },
+      "model_available": true,
+      "inputs": {
+        "speed_kmh": 50.0,
+        "speed_source": "assumed_unknown",
+        "speed_is_advisory": true,
+        "road_class_supplied": false,
+        "grade_supplied": false,
+        "scoring_distance_basis": "mapped route geometry length"
+      },
+      "routes": [
+        {
+          "provider_route_index": 0,
+          "state": "scored",
+          "distance_m": 11521.9,
+          "geometry_length_m": 11553.91,
+          "coverage": 0.9603,
+          "scored_length_m": 11095.79,
+          "missing_length_m": 458.12,
+          "sections_total": 170,
+          "sections_curve": 126,
+          "sections_scored": 159,
+          "smallest_radius_estimates_m": [
+            8.25,
+            8.47,
+            8.77
+          ],
+          "radius_census": {
+            "radius_sections": 135,
+            "radius_under_10m": 3,
+            "radius_under_25m": 15,
+            "radius_median_m": 312.8,
+            "radius_min_m": 8.25
+          },
+          "high_band_sections": 32,
+          "high_band_and_radius_under_25m": 15,
+          "median_vertex_spacing_m": 19.26,
+          "max_vertex_gap_m": 137.47,
+          "band_distribution": {
+            "high": 32,
+            "unavailable": 11,
+            "low": 108,
+            "moderate": 19
+          },
+          "advisories": 33,
+          "model_status_distribution": {
+            "baseline_fallback": 33,
+            "unavailable": 11,
+            "model_estimate": 126
+          },
+          "disagreement_sections": 33,
+          "ood_sections": 37,
+          "route_score": 23.83,
+          "route_band": "low",
+          "geometry_quality_issues": [
+            "highly uneven point spacing"
+          ],
+          "error": null
+        },
+        {
+          "provider_route_index": 1,
+          "state": "scored",
+          "distance_m": 12445.0,
+          "geometry_length_m": 12476.98,
+          "coverage": 0.9568,
+          "scored_length_m": 11937.6,
+          "missing_length_m": 539.37,
+          "sections_total": 159,
+          "sections_curve": 123,
+          "sections_scored": 150,
+          "smallest_radius_estimates_m": [
+            3.96,
+            8.72,
+            10.15
+          ],
+          "radius_census": {
+            "radius_sections": 129,
+            "radius_under_10m": 2,
+            "radius_under_25m": 13,
+            "radius_median_m": 284.01,
+            "radius_min_m": 3.96
+          },
+          "high_band_sections": 24,
+          "high_band_and_radius_under_25m": 13,
+          "median_vertex_spacing_m": 19.71,
+          "max_vertex_gap_m": 183.76,
+          "band_distribution": {
+            "high": 24,
+            "unavailable": 9,
+            "low": 104,
+            "moderate": 22
+          },
+          "advisories": 30,
+          "model_status_distribution": {
+            "baseline_fallback": 30,
+            "unavailable": 9,
+            "model_estimate": 120
+          },
+          "disagreement_sections": 30,
+          "ood_sections": 25,
+          "route_score": 22.5,
+          "route_band": "low",
+          "geometry_quality_issues": [
+            "highly uneven point spacing"
+          ],
+          "error": null
+        }
+      ],
+      "comparison": {
+        "state": "comparable",
+        "best_route_id": null,
+        "lowest_geometry_challenge_route_id": "route-1",
+        "score_gap": 1.33,
+        "coverage_spread": 0.0035,
+        "ranking_basis": "weighted geometry-challenge estimate; not an accident-risk ranking"
+      }
+    },
+    {
+      "origin_query": "Golconda Fort, Hyderabad",
+      "destination_query": "HITEC City, Madhapur, Hyderabad",
+      "origin": {
+        "display_name": "Golconda Fort, Royal Stairs, Bada Bazaar, Golconda, Ward 66 Langar Houz, Greater Hyderabad Municipal Corporation Central Zone, Hyderabad, Golconda mandal, Hyderabad, Telangana, 500008, India",
+        "lat": 17.3833665,
+        "lon": 78.4010991
+      },
+      "destination": {
+        "display_name": "HITEC City, Cyber Towers - Madhapur Main Road, Vittal Rao Nagar, Madhapur, Ward 104 Kondapur, Greater Hyderabad Municipal Corporation West Zone, Hyderabad, Serilingampalle mandal, Ranga Reddy, Telangana, 500081, India",
+        "lat": 17.4490055,
+        "lon": 78.3831376
+      },
+      "provider": {
+        "name": "osrm",
+        "attribution": "Routing by OSRM; map data \u00a9 OpenStreetMap contributors (ODbL)",
+        "fetched_at": "2026-10-18T05:37:34+00:00",
+        "cached": false
+      },
+      "model_available": true,
+      "inputs": {
+        "speed_kmh": 50.0,
+        "speed_source": "assumed_unknown",
+        "speed_is_advisory": true,
+        "road_class_supplied": false,
+        "grade_supplied": false,
+        "scoring_distance_basis": "mapped route geometry length"
+      },
+      "routes": [
+        {
+          "provider_route_index": 0,
+          "state": "scored",
+          "distance_m": 10953.3,
+          "geometry_length_m": 10975.08,
+          "coverage": 0.9645,
+          "scored_length_m": 10585.26,
+          "missing_length_m": 389.82,
+          "sections_total": 146,
+          "sections_curve": 115,
+          "sections_scored": 139,
+          "smallest_radius_estimates_m": [
+            7.09,
+            9.43,
+            9.66
+          ],
+          "radius_census": {
+            "radius_sections": 117,
+            "radius_under_10m": 3,
+            "radius_under_25m": 14,
+            "radius_median_m": 227.29,
+            "radius_min_m": 7.09
+          },
+          "high_band_sections": 20,
+          "high_band_and_radius_under_25m": 14,
+          "median_vertex_spacing_m": 20.06,
+          "max_vertex_gap_m": 167.25,
+          "band_distribution": {
+            "moderate": 24,
+            "low": 95,
+            "high": 20,
+            "unavailable": 7
+          },
+          "advisories": 26,
+          "model_status_distribution": {
+            "baseline_fallback": 25,
+            "model_estimate": 114,
+            "unavailable": 7
+          },
+          "disagreement_sections": 25,
+          "ood_sections": 24,
+          "route_score": 24.61,
+          "route_band": "low",
+          "geometry_quality_issues": [
+            "highly uneven point spacing"
+          ],
+          "error": null
+        },
+        {
+          "provider_route_index": 1,
+          "state": "scored",
+          "distance_m": 12972.2,
+          "geometry_length_m": 12997.61,
+          "coverage": 0.9574,
+          "scored_length_m": 12444.19,
+          "missing_length_m": 553.43,
+          "sections_total": 150,
+          "sections_curve": 110,
+          "sections_scored": 140,
+          "smallest_radius_estimates_m": [
+            8.71,
+            14.24,
+            14.5
+          ],
+          "radius_census": {
+            "radius_sections": 118,
+            "radius_under_10m": 1,
+            "radius_under_25m": 8,
+            "radius_median_m": 366.99,
+            "radius_min_m": 8.71
+          },
+          "high_band_sections": 12,
+          "high_band_and_radius_under_25m": 8,
+          "median_vertex_spacing_m": 22.22,
+          "max_vertex_gap_m": 460.13,
+          "band_distribution": {
+            "high": 12,
+            "moderate": 21,
+            "low": 107,
+            "unavailable": 10
+          },
+          "advisories": 12,
+          "model_status_distribution": {
+            "baseline_fallback": 21,
+            "model_estimate": 119,
+            "unavailable": 10
+          },
+          "disagreement_sections": 21,
+          "ood_sections": 24,
+          "route_score": 19.01,
+          "route_band": "low",
+          "geometry_quality_issues": [
+            "highly uneven point spacing"
+          ],
+          "error": null
+        }
+      ],
+      "comparison": {
+        "state": "ranked",
+        "best_route_id": "route-1",
+        "lowest_geometry_challenge_route_id": "route-1",
+        "score_gap": 5.6,
+        "coverage_spread": 0.0071,
+        "ranking_basis": "weighted geometry-challenge estimate; not an accident-risk ranking"
+      }
+    },
+    {
+      "origin_query": "Hussain Sagar Lake, Hyderabad",
+      "destination_query": "Gachibowli, Hyderabad",
+      "origin": {
+        "display_name": "Hussain Sagar, Greater Hyderabad Municipal Corporation Central Zone, Hyderabad, Khairatabad mandal, Hyderabad, Telangana, 500080, India",
+        "lat": 17.4229113,
+        "lon": 78.475421
+      },
+      "destination": {
+        "display_name": "Gachibowli, Greater Hyderabad Municipal Corporation West Zone, Hyderabad, Serilingampalle mandal, Ranga Reddy, Telangana, 500032, India",
+        "lat": 17.4436222,
+        "lon": 78.3519638
+      },
+      "provider": {
+        "name": "osrm",
+        "attribution": "Routing by OSRM; map data \u00a9 OpenStreetMap contributors (ODbL)",
+        "fetched_at": "2026-10-18T05:37:37+00:00",
+        "cached": false
+      },
+      "model_available": true,
+      "inputs": {
+        "speed_kmh": 50.0,
+        "speed_source": "assumed_unknown",
+        "speed_is_advisory": true,
+        "road_class_supplied": false,
+        "grade_supplied": false,
+        "scoring_distance_basis": "mapped route geometry length"
+      },
+      "routes": [
+        {
+          "provider_route_index": 0,
+          "state": "scored",
+          "distance_m": 18202.6,
+          "geometry_length_m": 18214.82,
+          "coverage": 0.9699,
+          "scored_length_m": 17666.06,
+          "missing_length_m": 548.77,
+          "sections_total": 182,
+          "sections_curve": 136,
+          "sections_scored": 172,
+          "smallest_radius_estimates_m": [
+            8.74,
+            13.02,
+            14.17
+          ],
+          "radius_census": {
+            "radius_sections": 143,
+            "radius_under_10m": 1,
+            "radius_under_25m": 9,
+            "radius_median_m": 504.14,
+            "radius_min_m": 8.74
+          },
+          "high_band_sections": 13,
+          "high_band_and_radius_under_25m": 9,
+          "median_vertex_spacing_m": 25.17,
+          "max_vertex_gap_m": 460.13,
+          "band_distribution": {
+            "low": 142,
+            "high": 13,
+            "unavailable": 10,
+            "moderate": 17
+          },
+          "advisories": 13,
+          "model_status_distribution": {
+            "model_estimate": 157,
+            "baseline_fallback": 15,
+            "unavailable": 10
+          },
+          "disagreement_sections": 15,
+          "ood_sections": 41,
+          "route_score": 16.5,
+          "route_band": "low",
+          "geometry_quality_issues": [
+            "highly uneven point spacing"
+          ],
+          "error": null
+        }
+      ],
+      "comparison": null
+    },
+    {
+      "origin_query": "Kukatpally, Hyderabad",
+      "destination_query": "Banjara Hills, Hyderabad",
+      "origin": {
+        "display_name": "Kukatpally, Ward 122 Vivekananda Nagar Colony, Greater Hyderabad Municipal Corporation West Zone, Hyderabad, Kukatpally mandal, Medchal\u2013Malkajgiri, Telangana, 500072, India",
+        "lat": 17.4930841,
+        "lon": 78.4054408
+      },
+      "destination": {
+        "display_name": "Banjara Hills, Ward 92 Venkateshwara Colony, Greater Hyderabad Municipal Corporation Central Zone, Hyderabad, Shaikpet mandal, Hyderabad, Telangana, 500034, India",
+        "lat": 17.4177464,
+        "lon": 78.4399014
+      },
+      "provider": {
+        "name": "osrm",
+        "attribution": "Routing by OSRM; map data \u00a9 OpenStreetMap contributors (ODbL)",
+        "fetched_at": "2026-10-18T05:37:39+00:00",
+        "cached": false
+      },
+      "model_available": true,
+      "inputs": {
+        "speed_kmh": 50.0,
+        "speed_source": "assumed_unknown",
+        "speed_is_advisory": true,
+        "road_class_supplied": false,
+        "grade_supplied": false,
+        "scoring_distance_basis": "mapped route geometry length"
+      },
+      "routes": [
+        {
+          "provider_route_index": 0,
+          "state": "scored",
+          "distance_m": 11840.9,
+          "geometry_length_m": 11868.68,
+          "coverage": 0.9831,
+          "scored_length_m": 11668.68,
+          "missing_length_m": 200.0,
+          "sections_total": 134,
+          "sections_curve": 85,
+          "sections_scored": 126,
+          "smallest_radius_estimates_m": [
+            6.61,
+            9.79,
+            10.61
+          ],
+          "radius_census": {
+            "radius_sections": 100,
+            "radius_under_10m": 2,
+            "radius_under_25m": 6,
+            "radius_median_m": 623.34,
+            "radius_min_m": 6.61
+          },
+          "high_band_sections": 10,
+          "high_band_and_radius_under_25m": 6,
+          "median_vertex_spacing_m": 21.92,
+          "max_vertex_gap_m": 460.03,
+          "band_distribution": {
+            "high": 10,
+            "low": 101,
+            "unavailable": 8,
+            "moderate": 15
+          },
+          "advisories": 12,
+          "model_status_distribution": {
+            "baseline_fallback": 14,
+            "model_estimate": 112,
+            "unavailable": 8
+          },
+          "disagreement_sections": 14,
+          "ood_sections": 16,
+          "route_score": 15.0,
+          "route_band": "low",
+          "geometry_quality_issues": [
+            "removed 1 duplicate point(s)",
+            "highly uneven point spacing"
+          ],
+          "error": null
+        }
+      ],
+      "comparison": null
+    },
+    {
+      "origin_query": "Mehdipatnam, Hyderabad",
+      "destination_query": "Uppal Cross Road, Hyderabad",
+      "origin": {
+        "display_name": "Mehdipatnam, Ward 70 Mehdipatnam, Greater Hyderabad Municipal Corporation Central Zone, Hyderabad, Asif Nagar mandal, Hyderabad, Telangana, 500028, India",
+        "lat": 17.3942627,
+        "lon": 78.4342514
+      },
+      "destination": {
+        "display_name": "Vaishnavi Olympiad School, Ganesh Nagar, Ramanthapur, Amberpet, Hyderabad, Telangana 500013, 2nd Cross B Road, Gokhale Nagar, Ward 8 Habsiguda, Greater Hyderabad Municipal Corporation East Zone, Hyderabad, Uppal mandal, Medchal\u2013Malkajgiri, Telangana, 500013, India",
+        "lat": 17.3953573,
+        "lon": 78.5305516
+      },
+      "provider": {
+        "name": "osrm",
+        "attribution": "Routing by OSRM; map data \u00a9 OpenStreetMap contributors (ODbL)",
+        "fetched_at": "2026-10-18T05:37:41+00:00",
+        "cached": false
+      },
+      "model_available": true,
+      "inputs": {
+        "speed_kmh": 50.0,
+        "speed_source": "assumed_unknown",
+        "speed_is_advisory": true,
+        "road_class_supplied": false,
+        "grade_supplied": false,
+        "scoring_distance_basis": "mapped route geometry length"
+      },
+      "routes": [
+        {
+          "provider_route_index": 0,
+          "state": "scored",
+          "distance_m": 12927.1,
+          "geometry_length_m": 12929.99,
+          "coverage": 0.964,
+          "scored_length_m": 12463.9,
+          "missing_length_m": 466.09,
+          "sections_total": 147,
+          "sections_curve": 112,
+          "sections_scored": 138,
+          "smallest_radius_estimates_m": [
+            6.63,
+            8.43,
+            12.44
+          ],
+          "radius_census": {
+            "radius_sections": 117,
+            "radius_under_10m": 2,
+            "radius_under_25m": 11,
+            "radius_median_m": 306.26,
+            "radius_min_m": 6.63
+          },
+          "high_band_sections": 17,
+          "high_band_and_radius_under_25m": 11,
+          "median_vertex_spacing_m": 23.94,
+          "max_vertex_gap_m": 329.01,
+          "band_distribution": {
+            "high": 17,
+            "moderate": 24,
+            "low": 97,
+            "unavailable": 9
+          },
+          "advisories": 18,
+          "model_status_distribution": {
+            "baseline_fallback": 23,
+            "model_estimate": 115,
+            "unavailable": 9
+          },
+          "disagreement_sections": 23,
+          "ood_sections": 24,
+          "route_score": 21.59,
+          "route_band": "low",
+          "geometry_quality_issues": [
+            "highly uneven point spacing"
+          ],
+          "error": null
+        },
+        {
+          "provider_route_index": 1,
+          "state": "scored",
+          "distance_m": 13013.2,
+          "geometry_length_m": 13016.28,
+          "coverage": 0.9773,
+          "scored_length_m": 12720.17,
+          "missing_length_m": 296.11,
+          "sections_total": 159,
+          "sections_curve": 115,
+          "sections_scored": 152,
+          "smallest_radius_estimates_m": [
+            8.43,
+            13.92,
+            15.16
+          ],
+          "radius_census": {
+            "radius_sections": 128,
+            "radius_under_10m": 1,
+            "radius_under_25m": 8,
+            "radius_median_m": 411.27,
+            "radius_min_m": 8.43
+          },
+          "high_band_sections": 15,
+          "high_band_and_radius_under_25m": 8,
+          "median_vertex_spacing_m": 25.33,
+          "max_vertex_gap_m": 155.46,
+          "band_distribution": {
+            "high": 15,
+            "moderate": 18,
+            "low": 119,
+            "unavailable": 7
+          },
+          "advisories": 18,
+          "model_status_distribution": {
+            "baseline_fallback": 21,
+            "model_estimate": 131,
+            "unavailable": 7
+          },
+          "disagreement_sections": 21,
+          "ood_sections": 25,
+          "route_score": 20.27,
+          "route_band": "low",
+          "geometry_quality_issues": [
+            "highly uneven point spacing"
+          ],
+          "error": null
+        }
+      ],
+      "comparison": {
+        "state": "comparable",
+        "best_route_id": null,
+        "lowest_geometry_challenge_route_id": "route-1",
+        "score_gap": 1.32,
+        "coverage_spread": 0.0133,
+        "ranking_basis": "weighted geometry-challenge estimate; not an accident-risk ranking"
+      }
+    }
+  ]
+}

@@ -3,8 +3,10 @@
 // tests exercise the FRONTEND (nav state machine, layout, alert cue playback); the
 // analyze *contract* itself is covered offline by tests/test_api_routes.py.
 
-const PNG_1PX = Buffer.from(
-  "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+M8AAAMBAQDJ/pLvAAAAAElFTkSuQmCC",
+// 1x1 solid tile in the app's basemap tint, so a mocked map reads as a blank
+// placeholder rather than black holes in the Review 2 screenshots.
+const PNG_TILE_PLACEHOLDER = Buffer.from(
+  "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAADElEQVR4nGN48f4lAAWDAsGQRaiyAAAAAElFTkSuQmCC",
   "base64",
 );
 
@@ -200,8 +202,10 @@ const GEOCODE = {
 export async function installMocks(context, { analyze = "scored", authed = false } = {}) {
   const seen = { analyzeClientHeader: null, analyzeBody: null, analyzeMethod: null };
 
-  await context.route("**/tile.openstreetmap.org/**", (route) =>
-    route.fulfill({ status: 200, contentType: "image/png", body: PNG_1PX }),
+  // Leaflet requests tiles from {a,b,c}.tile.openstreetmap.org, so the glob has to match
+  // the subdomain too — `**/tile.openstreetmap.org/**` silently let REAL tiles through.
+  await context.route(/tile\.openstreetmap\.org/, (route) =>
+    route.fulfill({ status: 200, contentType: "image/png", body: PNG_TILE_PLACEHOLDER }),
   );
 
   await context.route("**/api/v1/auth/me", (route) =>
