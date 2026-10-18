@@ -24,10 +24,11 @@ spun as fixed.
 
 | # | Was | Severity | Fix | Now asserted by |
 |---|---|---|---|---|
-| A | Trip summary sheet rendered empty | High | `detailBlock` expects an array; wrapped node at `app/web/app.js:925`. | Manual browser (still no e2e) |
+| A | Trip summary sheet rendered empty | High | `detailBlock` expects an array; wrapped node in `app/web/app.js::renderTripSummary`. | `rider.spec.js` navigation-lifecycle E2E case (asserts the summary sheet content) — no longer manual-only |
 | B | Audit action `hazard_verifyd`/`hazard_rejectd` | Medium | Emit `hazard_verified`/`hazard_rejected` in `app/hazards.py`. | `test_api::test_admin_moderate_and_audit` |
 | C | The "mock" E2E suite was silently loading **live** OSM map tiles: the harness glob `**/tile.openstreetmap.org/**` does not match Leaflet's `{a,b,c}.tile…` subdomains | Medium (test honesty) | Subdomain-agnostic pattern in `tests/e2e/_harness.js`, plus a solid placeholder tile so captures are visibly synthetic. | `npx playwright test` (17 cases) now runs with no tile traffic; `tests/e2e/screenshots.spec.js` asserts the captures exist |
 | D | Rider UI rendered `~0 km/h` / `data-status="below"` when the device reported no speed, because `Number(null) === 0` | High (product honesty) | Absence checked before coercion in `app/web/app.js::onFix`; fixed in source, not by relaxing the test. | `rider.spec.js` "device reports no speed" + `tests/js/alerts.test.js` |
+| E | The 390 px rider captures were **not reproducible** between runs — infinite CSS keyframes (`pulse`, `alert-pulse`) froze at different phases, and Leaflet's JS map pan kept moving after the assertions | Medium (evidence quality) | `animations: "disabled"` + `settleMap()` (polls the `.leaflet-map-pane` transform) in `tests/e2e/screenshots.spec.js`. Diagnosed by decoding the PNGs and diffing pixel arrays, **not** by comparing bytes — Chromium emits different PNG streams for identical pixels, so byte hashes are not a determinism test. | Three consecutive `npx playwright test tests/e2e/screenshots.spec.js` runs → identical decoded-pixel hashes for all three files (measured 2026-10-18) |
 
 ## Scratch / artifacts to exclude from packaging
 

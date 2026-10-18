@@ -163,6 +163,28 @@ against disk: `radius_median_m` spans 227.29–623.34 m, `random_forest` p95 **4
 rejected against the 12.0 ms budget), OOD-type empirical coverage **0.6786**, 3 files in
 `docs/screenshots/`.
 
+### TASK 4 addendum — the "deterministic" screenshot claim was not true (2026-10-18)
+
+Re-running the suite on the committed tree changed a tracked PNG, so the docs' word
+"deterministic" was checked rather than trusted:
+
+| Step | Actual result |
+|---|---|
+| `npx playwright test` then `git status --short` | `M docs/screenshots/rider-3-advisory-high-speed-above-390.png` — a re-run rewrote a committed capture |
+| IDAT-hash compare (committed vs re-run) | differs, 45,593 → 45,626 bytes |
+| PIL diff of the two frames | **371 differing pixels** inside bbox (116,407)–(243,535) — over the map, i.e. the marker/polyline, not the advisory text |
+| Fix 1: `animations: "disabled"` on the 3 captures | killed the CSS-phase variance (`pulse`/`alert-pulse` are `infinite`) |
+| Fix 2: `settleMap()` — poll `.leaflet-map-pane` `transform` until stable | killed the remaining variance; Leaflet pans with a **JS** timer that `animations: "disabled"` does not touch |
+| Verification: 3 consecutive runs, hash of **decoded RGBA** | identical every run: `e8e5f82c84ba` (rider-1) / `3263d6dfacad` (rider-2) / `cfa3c90ea61f` (rider-3) |
+| Control that mattered | byte/IDAT comparison is **not** a determinism test: two files with **0 differing pixels** had different IDAT streams (Chromium's PNG writer is not byte-stable) |
+
+No product code changed for this — it was a test-harness and evidence-quality defect. Captions in
+`REAL_ROUTE_CHECK.md` were re-checked against the current pixels (rider-1 `33.1 MODERATE`,
+"99% of 1.6 km scored · 20 m without usable geometry"; rider-2 "…(0.42 g) matches the 45 km/h
+band…"; rider-3 the 1.68 g / 4.00× sentence) and all still quote what is rendered. Also corrected
+in this pass: `KNOWN_ISSUES` row A still said the trip summary was "manual browser (still no e2e)"
+although `rider.spec.js:62` covers it, and `MANUAL_RUNBOOK` still said 105 / 23 / 7 cases.
+
 ### TASK 4 — live real-route plausibility check (2026-10-18)
 
 | Command | Actual output |

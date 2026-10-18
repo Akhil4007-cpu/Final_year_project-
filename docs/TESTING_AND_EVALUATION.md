@@ -37,7 +37,7 @@ context manager so the app lifespan — DB migration + artifact load — runs).
 | `tests/test_compliance.py` | 7 | R2 grep, R4 phrase audit, "accident probability" only negated, R10 import graph, R8 secret scan, R3/R5 error codes, R7 assumptions | Static/Compliance |
 | `tests/test_db_backup.py` | 1 | populate→`backup_database`→restore loses 0 rows, `PRAGMA integrity_check` ok, restored DB still enforces role gate + returns verified hazard | Integration |
 
-## Real bugs found and fixed (in source, not tests)
+## Real bugs found and fixed (in source, never by weakening a test)
 
 Per project rule, tests were **not** weakened; the source was corrected:
 
@@ -60,6 +60,17 @@ Per project rule, tests were **not** weakened; the source was corrected:
    `{a,b,c}.tile.openstreetmap.org` subdomains. Found while capturing the 390 px rider
    screenshots (real Hyderabad street labels appeared in the image). Fixed with a
    subdomain-agnostic pattern in [tests/e2e/_harness.js](../tests/e2e/_harness.js).
+5. **Screenshot captures were not reproducible** — two distinct causes, both in the test
+   harness, not the product: (a) the UI's `pulse` / `alert-pulse` keyframes are `infinite`, so
+   each run froze at a different phase; (b) Leaflet pans the map with a **JS** timer that
+   `animations: "disabled"` does not touch, so the marker and polyline moved between capture and
+   assertion. Diagnosed by decoding the PNGs and diffing pixel arrays (one 371-px region over the
+   map in the high-band capture; a 1237-px region in the moderate one). Fixed in
+   `tests/e2e/screenshots.spec.js` with `animations: "disabled"` plus `settleMap()`, which polls
+   the `.leaflet-map-pane` transform until it is stable. Verified by three consecutive runs with
+   identical decoded-pixel hashes. **Side finding recorded so nobody re-makes it:** comparing
+   PNG *bytes* or IDAT hashes is not a determinism test — Chromium emitted different compressed
+   streams for pixel-identical images.
 
 One test assertion was corrected because it encoded *my wrong assumption*, not a code bug:
 `test_project_to_local_origin_is_zero` was rewritten to assert the actual (correct)
@@ -109,7 +120,15 @@ the test was.
   (2 cases):** regenerate the three 390 px rider captures in `docs/screenshots/` — analysed
   route panel, moderate in-curve advisory with a *matching* speed note, high in-curve advisory
   with an *above* speed note — asserting the DOM state (band, `data-status`, settled opacity)
-  before each capture and that the files exist. **Every
+  before each capture and that the files exist. **The captures are now pixel-reproducible:**
+  hashing the decoded RGBA of all three files across **three consecutive runs** gives identical
+  values (`e8e5f82c84ba` / `3263d6dfacad` / `cfa3c90ea61f` every run). That needed two fixes —
+  `animations: "disabled"` (the UI's `pulse`/`alert-pulse` keyframes are `infinite`, so earlier
+  runs caught different phases) and `settleMap()`, which polls the Leaflet map pane's CSS
+  `transform` until it stops changing, because `animations: "disabled"` only freezes *CSS*
+  animations and Leaflet pans the map with its own JS timer (bug 5 below). Note that **file bytes
+  are not a valid determinism test**: Chromium's PNG writer produced different IDAT streams for
+  pixel-identical images, so the check compares decoded pixels. **Every
   `/api/v1/*` response in these tests is MOCKED and labelled `mock`** (geocode, analyze, hazards,
   auth, all `/admin/*`) and OSM tiles are stubbed on every `*.tile.openstreetmap.org` subdomain
   (see bug 4 above) — no OSRM/Nominatim/model dependency, so it is
