@@ -27,6 +27,8 @@ HEADLINES = {
     "clean_r2": ("clean", "r2"),
     "clean_mae": ("clean", "mae"),
     "degraded_mae": ("degraded", "mae"),
+    "degraded_rmse": ("degraded", "rmse"),
+    "degraded_r2": ("degraded", "r2"),
     "degraded_baseline_mae": ("degraded", "baseline_mae"),
     "ood_radius_mae": ("ood_radius", "mae"),
     "ood_radius_baseline_mae": ("ood_radius", "baseline_mae"),

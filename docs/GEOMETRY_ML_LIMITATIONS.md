@@ -31,11 +31,61 @@ spun as strengths; the point of this document is that no over-claim is made (R1,
   At very high noise the model is materially less certain; intervals widen but **cannot
   guarantee coverage** OOD.
 
+## Runtime-served accuracy: what the disagreement fallback costs
+
+The §7.5 suite reports the **model's** error. At runtime the shipped guard
+([app/model.py](../app/model.py) `DISAGREEMENT_THRESHOLD = 20.0`) replaces the model with the
+physics baseline whenever `|model − baseline| > 20` and tags the section `baseline_fallback`.
+That substitution changes what the rider actually sees, so it was measured directly
+(`python -m ml.fallback_audit`, seed 42, committed artifact, **threshold unchanged** —
+`ml/artifacts/fallback_audit.json`). The audit refuses to report unless its regenerated
+model-only MAE matches `eval_results.json` to ±0.0015, which it does on all four headline
+slices.
+
+| slice | n | fallback fires | **served** MAE | model-only MAE | baseline MAE | served − model | guard was right |
+|---|---|---|---|---|---|---|---|
+| clean | 156 | 0.6 % | 0.445 | 0.573 | 0.089 | −0.128 | 100 % |
+| degraded (mixed) | 144 | **61.1 %** | **27.252** | 14.142 | 27.826 | **+13.110** | 20 % |
+| noise σ=3 m | 156 | 72.4 % | 32.960 | 13.247 | 33.723 | +19.713 | 15 % |
+| noise σ=6 m | 149 | 89.3 % | 40.599 | 16.435 | 40.936 | +24.164 | 17 % |
+| noise σ=10 m | 148 | 85.8 % | 39.144 | 19.365 | 39.588 | +19.779 | 21 % |
+| noise σ=15 m | 153 | 85.6 % | 36.198 | 18.299 | 36.784 | +17.898 | 24 % |
+| noise σ=20 m | 151 | 80.8 % | 34.733 | 23.589 | 34.607 | +11.144 | 38 % |
+| OOD radius 300–700 m | 102 | **67.7 %** | **42.394** | 14.994 | 43.287 | **+27.400** | 3 % |
+| OOD type (hairpin) | 140 | 66.4 % | 12.593 | 20.307 | 12.647 | **−7.714** | 72 % |
+
+**Read this plainly.** The guard is worth it on exactly one slice — the unseen *curve type*
+(hairpin), where the model is genuinely worse than the baseline and the guard recovers 7.7
+MAE and is right 72 % of the time. On degraded, noise and OOD-*radius* input it is close to
+counterproductive: it fires on 61–89 % of sections, and because a large model−baseline gap on
+those slices is usually the model *correcting* degraded geometry rather than erring, the guard
+is right only 3–38 % of the time. The consequence: **the score a rider is served on degraded
+input (27.252) is barely better than the pure baseline (27.826), nowhere near the model's own
+14.142.** So "GACE cuts degraded MAE from 27.826 to ~14" is a statement about the model, not
+about the guarded pipeline's served output; both numbers are reported here to avoid the
+ambiguity.
+
+A calibration-split-only sweep of the same rule (in `fallback_audit.json`,
+`calibration_only_threshold_sweep`) shows served MAE falling monotonically as the threshold
+rises — 29.95 at 20, 27.10 at 30, 22.86 at 40, 19.80 at 50, 14.76 with the guard off — i.e.
+**no finite threshold beats "don't guard" on degraded input**; the guard's only measured value
+is OOD-*type* protection. **The threshold was not retuned.** Changing it would trade a
+documented safety behaviour for accuracy on synthetic labels, which is a design decision for
+the supervisor, not a post-hoc reaction to test numbers (plan R-rule: no loosening thresholds
+after seeing results). What *is* recommended: keep the guard, keep surfacing the `disagreement`
+flag and `baseline_fallback` provenance, and quote served MAE (not model MAE) whenever the
+runtime path is described.
+
 ## Feature/context limitations
 
 - **Speed is an advisory band, not measured or legal speed.** When the caller omits it,
   it is assumed from road class and flagged `speed_missing` — the number reflects an
-  assumption, and the response says so.
+  assumption, and the response says so. Since TASK 2 the rider UI additionally reads the
+  device's `coords.speed` during navigation and shows how the lateral demand at that speed
+  compares, in g, with the demand implied by the band the score used
+  (`app/web/alerts.js` `speedAwareness`). This is a **note, not a re-score**: the model and
+  baseline both still see the banded speed, so no published metric changes, and devices that
+  report no speed (most desktops) see an explicit disclosure rather than a silent 0 km/h.
 - **Grade and geometry quality can be missing**; they are imputed with documented
   defaults and flagged, never silently treated as observed (R3).
 - The score encodes **only mapped road shape plus assumed context**. It deliberately

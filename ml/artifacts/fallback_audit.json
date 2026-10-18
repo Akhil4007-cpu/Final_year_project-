@@ -1,0 +1,173 @@
+{
+  "artifact": "ml\\artifacts\\model.joblib",
+  "dataset_seed": 42,
+  "dataset_sha256": "5e92447a370b2646c8929a434a577f9decf5694afb28e3c2d76ce93415d5db9d",
+  "per_type": 140,
+  "rule": "serve baseline when |model_score - baseline_score| > 20.0 (app/model.py DISAGREEMENT_THRESHOLD)",
+  "threshold_retuned": false,
+  "calibration_only_threshold_sweep": [
+    {
+      "threshold": 0.0,
+      "fallback_rate": 0.9934,
+      "served_mae": 31.177
+    },
+    {
+      "threshold": 5.0,
+      "fallback_rate": 0.8212,
+      "served_mae": 31.154
+    },
+    {
+      "threshold": 10.0,
+      "fallback_rate": 0.7815,
+      "served_mae": 31.032
+    },
+    {
+      "threshold": 20.0,
+      "fallback_rate": 0.6358,
+      "served_mae": 29.95
+    },
+    {
+      "threshold": 30.0,
+      "fallback_rate": 0.457,
+      "served_mae": 27.099
+    },
+    {
+      "threshold": 40.0,
+      "fallback_rate": 0.2914,
+      "served_mae": 22.864
+    },
+    {
+      "threshold": 50.0,
+      "fallback_rate": 0.1722,
+      "served_mae": 19.798
+    },
+    {
+      "threshold": null,
+      "fallback_rate": 0.0,
+      "served_mae": 14.761
+    }
+  ],
+  "consistency_check": "model_only_mae matches ml/artifacts/eval_results.json within 0.0015",
+  "slices": {
+    "clean": {
+      "count": 156,
+      "fallback_sections": 1,
+      "fallback_rate": 0.0064,
+      "served_mae": 0.445,
+      "model_only_mae": 0.573,
+      "baseline_mae": 0.089,
+      "served_minus_model_mae": -0.128,
+      "mean_abs_model_minus_baseline": 0.545,
+      "fallbacks_where_baseline_was_closer": 1,
+      "fallback_precision": 1.0
+    },
+    "degraded": {
+      "count": 144,
+      "fallback_sections": 88,
+      "fallback_rate": 0.6111,
+      "served_mae": 27.252,
+      "model_only_mae": 14.142,
+      "baseline_mae": 27.826,
+      "served_minus_model_mae": 13.11,
+      "mean_abs_model_minus_baseline": 28.401,
+      "fallbacks_where_baseline_was_closer": 18,
+      "fallback_precision": 0.2045
+    },
+    "ood_radius": {
+      "count": 102,
+      "fallback_sections": 69,
+      "fallback_rate": 0.6765,
+      "served_mae": 42.394,
+      "model_only_mae": 14.994,
+      "baseline_mae": 43.287,
+      "served_minus_model_mae": 27.4,
+      "mean_abs_model_minus_baseline": 32.255,
+      "fallbacks_where_baseline_was_closer": 2,
+      "fallback_precision": 0.029
+    },
+    "ood_type": {
+      "count": 140,
+      "fallback_sections": 93,
+      "fallback_rate": 0.6643,
+      "served_mae": 12.593,
+      "model_only_mae": 20.307,
+      "baseline_mae": 12.647,
+      "served_minus_model_mae": -7.714,
+      "mean_abs_model_minus_baseline": 26.954,
+      "fallbacks_where_baseline_was_closer": 67,
+      "fallback_precision": 0.7204
+    },
+    "noise_0m": {
+      "count": 156,
+      "fallback_sections": 1,
+      "fallback_rate": 0.0064,
+      "served_mae": 0.445,
+      "model_only_mae": 0.573,
+      "baseline_mae": 0.089,
+      "served_minus_model_mae": -0.128,
+      "mean_abs_model_minus_baseline": 0.545,
+      "fallbacks_where_baseline_was_closer": 1,
+      "fallback_precision": 1.0
+    },
+    "noise_3m": {
+      "count": 156,
+      "fallback_sections": 113,
+      "fallback_rate": 0.7244,
+      "served_mae": 32.96,
+      "model_only_mae": 13.247,
+      "baseline_mae": 33.723,
+      "served_minus_model_mae": 19.713,
+      "mean_abs_model_minus_baseline": 32.624,
+      "fallbacks_where_baseline_was_closer": 17,
+      "fallback_precision": 0.1504
+    },
+    "noise_6m": {
+      "count": 149,
+      "fallback_sections": 133,
+      "fallback_rate": 0.8926,
+      "served_mae": 40.599,
+      "model_only_mae": 16.435,
+      "baseline_mae": 40.936,
+      "served_minus_model_mae": 24.164,
+      "mean_abs_model_minus_baseline": 41.401,
+      "fallbacks_where_baseline_was_closer": 22,
+      "fallback_precision": 0.1654
+    },
+    "noise_10m": {
+      "count": 148,
+      "fallback_sections": 127,
+      "fallback_rate": 0.8581,
+      "served_mae": 39.144,
+      "model_only_mae": 19.365,
+      "baseline_mae": 39.588,
+      "served_minus_model_mae": 19.779,
+      "mean_abs_model_minus_baseline": 41.269,
+      "fallbacks_where_baseline_was_closer": 27,
+      "fallback_precision": 0.2126
+    },
+    "noise_15m": {
+      "count": 153,
+      "fallback_sections": 131,
+      "fallback_rate": 0.8562,
+      "served_mae": 36.198,
+      "model_only_mae": 18.299,
+      "baseline_mae": 36.784,
+      "served_minus_model_mae": 17.898,
+      "mean_abs_model_minus_baseline": 41.286,
+      "fallbacks_where_baseline_was_closer": 32,
+      "fallback_precision": 0.2443
+    },
+    "noise_20m": {
+      "count": 151,
+      "fallback_sections": 122,
+      "fallback_rate": 0.8079,
+      "served_mae": 34.733,
+      "model_only_mae": 23.589,
+      "baseline_mae": 34.607,
+      "served_minus_model_mae": 11.144,
+      "mean_abs_model_minus_baseline": 41.178,
+      "fallbacks_where_baseline_was_closer": 46,
+      "fallback_precision": 0.377
+    }
+  }
+}
