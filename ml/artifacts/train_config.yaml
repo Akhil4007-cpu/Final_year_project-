@@ -1,0 +1,16 @@
+generator_version: generator_v1
+label_version: label_v1
+models:
+  decision_tree:
+    max_depth: 10
+    min_samples_leaf: 4
+  hist_gradient_boosting:
+    learning_rate: 0.06
+    max_iter: 400
+  random_forest:
+    min_samples_leaf: 2
+    n_estimators: 250
+nominal_coverage: 0.8
+output_dir: ml\artifacts
+per_type: 140
+seed: 42

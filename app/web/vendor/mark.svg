@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="RoadGuard">
+  <rect width="64" height="64" rx="16" fill="#0f3d2e"/>
+  <path d="M32 8 16 15v14c0 11.6 6.8 20.9 16 27 9.2-6.1 16-15.4 16-27V15L32 8Z" fill="#0f6b4f"/>
+  <path d="M26 48 30.5 20h3L38 48h-3.2l-1-6.4h-3.6l-1 6.4H26Zm4.9-9.6h2.2L32 30.6l-1.1 7.8Z" fill="#eef7f1"/>
+</svg>

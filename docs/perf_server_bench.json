@@ -1,0 +1,77 @@
+{
+  "python": "3.10.10",
+  "model": {
+    "artifact": "D:\\FP_ROADGUARD\\ml\\artifacts\\model.joblib",
+    "model_name": "hist_gradient_boosting"
+  },
+  "analyze": {
+    "endpoint": "POST /routes/analyze (provider mocked, alternatives=2 routes)",
+    "single_call_latency": {
+      "n": 60,
+      "p50_ms": 15.81,
+      "p95_ms": 17.245,
+      "p99_ms": 18.209,
+      "mean_ms": 15.116,
+      "max_ms": 18.651
+    },
+    "concurrency": {
+      "c1": {
+        "n": 60,
+        "p50_ms": 15.845,
+        "p95_ms": 17.101,
+        "p99_ms": 17.54,
+        "mean_ms": 15.194,
+        "max_ms": 17.785,
+        "throughput_rps": 65.59
+      },
+      "c5": {
+        "n": 60,
+        "p50_ms": 15.79,
+        "p95_ms": 16.821,
+        "p99_ms": 16.999,
+        "mean_ms": 14.84,
+        "max_ms": 17.07,
+        "throughput_rps": 67.19
+      },
+      "c20": {
+        "n": 60,
+        "p50_ms": 14.712,
+        "p95_ms": 16.637,
+        "p99_ms": 18.623,
+        "mean_ms": 14.478,
+        "max_ms": 21.02,
+        "throughput_rps": 68.83
+      }
+    }
+  },
+  "model_scoring": {
+    "sections": 10,
+    "per_section_loop_before": {
+      "n": 30,
+      "p50_ms": 41.014,
+      "p95_ms": 47.658,
+      "p99_ms": 49.056,
+      "mean_ms": 41.532,
+      "max_ms": 49.106,
+      "per_section_mean_ms": 4.1532
+    },
+    "single_batch_after": {
+      "n": 30,
+      "p50_ms": 4.321,
+      "p95_ms": 5.69,
+      "p99_ms": 6.139,
+      "mean_ms": 4.255,
+      "max_ms": 6.251,
+      "per_section_mean_ms": 0.4255
+    },
+    "p50_speedup_x": 9.49
+  },
+  "provider_cache": {
+    "cold_call_cached": false,
+    "warm_identical_call_cached": true,
+    "cache_entries_before_flood": 2,
+    "cache_entries_after_300_distinct": 256,
+    "cache_limit": 256,
+    "cache_bounded": true
+  }
+}

@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0f3d2e">
+  <meta name="description" content="RoadGuard AI — mapped road-geometry advisory for riders. Not an accident probability.">
+  <title>RoadGuard AI</title>
+  <link rel="icon" href="/static/vendor/mark.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/static/vendor/leaflet/leaflet.css">
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#search-input">Skip to destination search</a>
+
+  <header class="topbar">
+    <div class="brand" aria-label="RoadGuard AI">
+      <img class="brand-mark" src="/static/vendor/mark.svg" alt="" width="28" height="28">
+      <span class="brand-name">RoadGuard</span><span class="brand-ai">AI</span>
+    </div>
+    <div class="topbar-actions">
+      <button id="gps-chip" class="chip chip-gps" type="button" title="Location status">
+        <span class="chip-dot" aria-hidden="true"></span>
+        <span id="gps-chip-text">Location off</span>
+      </button>
+      <button id="settings-button" class="icon-button" type="button" aria-label="Alert settings">
+        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path fill="currentColor" d="M19.4 13a7.8 7.8 0 0 0 .06-1 7.8 7.8 0 0 0-.06-1l2.1-1.6a.5.5 0 0 0 .12-.62l-2-3.46a.5.5 0 0 0-.6-.22l-2.5 1a7.3 7.3 0 0 0-1.7-1l-.38-2.65a.5.5 0 0 0-.5-.42h-4a.5.5 0 0 0-.5.42l-.38 2.65a7.3 7.3 0 0 0-1.7 1l-2.5-1a.5.5 0 0 0-.6.22l-2 3.46a.5.5 0 0 0 .12.62L4.54 11a7.8 7.8 0 0 0 0 2l-2.1 1.6a.5.5 0 0 0-.12.62l2 3.46a.5.5 0 0 0 .6.22l2.5-1a7.3 7.3 0 0 0 1.7 1l.38 2.65a.5.5 0 0 0 .5.42h4a.5.5 0 0 0 .5-.42l.38-2.65a7.3 7.3 0 0 0 1.7-1l2.5 1a.5.5 0 0 0 .6-.22l2-3.46a.5.5 0 0 0-.12-.62L19.4 13ZM12 15.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7Z"/></svg>
+      </button>
+      <button id="account-button" class="icon-button" type="button" aria-label="Account">
+        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path fill="currentColor" d="M12 12a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9Zm0 2c-4.4 0-8 2.2-8 5v1h16v-1c0-2.8-3.6-5-8-5Z"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <main id="app-shell">
+    <div id="map" role="application" aria-label="Road map. Use the search field to choose a destination."></div>
+
+    <section class="panel search-panel" id="search-panel" aria-labelledby="search-heading">
+      <h1 id="search-heading" class="sr-only">Find a destination</h1>
+      <form id="search-form" class="search-form" role="search">
+        <label class="sr-only" for="search-input">Search for a destination</label>
+        <input id="search-input" name="q" type="search" placeholder="Search a place in India" autocomplete="off" minlength="2" maxlength="200" required>
+        <button class="primary" id="search-submit" type="submit">Search</button>
+      </form>
+      <p id="search-hint" class="hint">Search is powered by OpenStreetMap Nominatim. Results are places, not live traffic.</p>
+      <ul id="search-results" class="results" hidden></ul>
+    </section>
+
+    <div class="map-actions" role="group" aria-label="Map actions">
+      <button id="locate-button" class="round-button" type="button" title="Centre on my location" aria-label="Centre on my location">
+        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path fill="currentColor" d="M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8Zm9 3h-2.1a7 7 0 0 0-5.9-5.9V3h-2v2.1A7 7 0 0 0 5.1 11H3v2h2.1a7 7 0 0 0 5.9 5.9V21h2v-2.1a7 7 0 0 0 5.9-5.9H21v-2Zm-9 6a5 5 0 1 1 0-10 5 5 0 0 1 0 10Z"/></svg>
+      </button>
+      <button id="report-button" class="round-button round-accent" type="button" title="Report a hazard" aria-label="Report a road hazard">
+        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path fill="currentColor" d="M12 2 1 21h22L12 2Zm0 4.1L19.7 19H4.3L12 6.1ZM11 10v5h2v-5h-2Zm0 6.5v2h2v-2h-2Z"/></svg>
+      </button>
+    </div>
+
+    <section id="route-panel" class="panel route-panel" hidden aria-labelledby="route-title">
+      <div class="panel-head">
+        <div>
+          <p class="eyebrow" id="route-eyebrow">Analysed route</p>
+          <h2 id="route-title">Route</h2>
+        </div>
+        <button id="route-close" class="icon-button" type="button" aria-label="Close route panel">
+          <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="m6.4 5 5.6 5.6L17.6 5 19 6.4 13.4 12l5.6 5.6-1.4 1.4-5.6-5.6L6.4 19 5 17.6l5.6-5.6L5 6.4 6.4 5Z"/></svg>
+        </button>
+      </div>
+      <dl class="metrics">
+        <div><dt>Distance</dt><dd id="route-distance">—</dd></div>
+        <div><dt>Provider ETA</dt><dd id="route-eta">—</dd></div>
+        <div><dt>Challenge</dt><dd><span id="route-score-value">—</span><span id="route-band" class="band-pill"></span></dd></div>
+      </dl>
+      <div class="coverage">
+        <div class="coverage-bar" aria-hidden="true"><span id="coverage-fill"></span></div>
+        <p id="coverage-text" class="hint">—</p>
+      </div>
+      <p id="comparison-note" class="comparison-note" hidden></p>
+      <label class="speed-row" for="speed-select">
+        <span>Riding-speed assumption</span>
+        <select id="speed-select">
+          <option value="">50 km/h (class default)</option>
+          <option value="30">30 km/h</option>
+          <option value="40">40 km/h</option>
+          <option value="50">50 km/h</option>
+          <option value="60">60 km/h</option>
+          <option value="70">70 km/h</option>
+        </select>
+      </label>
+      <div class="route-actions">
+        <button id="start-nav" class="primary" type="button">Start advisories</button>
+        <button id="alternatives-button" type="button">Alternatives</button>
+        <button id="detail-button" type="button">Details</button>
+      </div>
+      <p class="disclaimer">Geometry challenge indicator — not an accident probability. Advisory only; real conditions may differ.</p>
+    </section>
+
+    <div id="advisory-banner" class="advisory" role="status" aria-live="polite" hidden>
+      <div class="advisory-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="24" height="24"><path fill="currentColor" d="M12 2 1 21h22L12 2Zm0 5.5 6.5 11.5h-13L12 7.5ZM11 10v4.5h2V10h-2Zm0 5.8v2h2v-2h-2Z"/></svg>
+      </div>
+      <div>
+        <p class="advisory-title" id="advisory-title">Curve ahead</p>
+        <p class="advisory-text" id="advisory-text"></p>
+        <p class="advisory-note">Advisory based on mapped road shape; real conditions may differ.</p>
+      </div>
+      <button id="advisory-dismiss" class="icon-button" type="button" aria-label="Dismiss advisory">×</button>
+    </div>
+
+    <p id="alert-announce" class="sr-only" role="alert" aria-live="assertive"></p>
+
+    <section id="nav-hud" class="nav-hud" hidden aria-label="Navigation status">
+      <div class="nav-copy">
+        <p id="nav-instruction" class="nav-instruction">On route</p>
+        <p id="nav-meta" class="nav-meta">—</p>
+      </div>
+      <button id="nav-end" class="danger-button" type="button">End</button>
+    </section>
+
+    <p id="router-note" class="router-note" hidden>
+      <span id="router-note-text"></span>
+      <button id="router-retry" type="button" class="secondary">Recalculate</button>
+    </p>
+
+    <section id="alternatives-sheet" class="sheet" hidden aria-labelledby="alternatives-title" role="dialog" aria-modal="false">
+      <div class="panel-head">
+        <div>
+          <p class="eyebrow">Provider alternatives</p>
+          <h2 id="alternatives-title">Route comparison</h2>
+        </div>
+        <button id="alternatives-close" class="icon-button" type="button" aria-label="Close alternatives">×</button>
+      </div>
+      <p id="alternatives-note" class="hint"></p>
+      <ul id="alternatives-list" class="route-list"></ul>
+    </section>
+
+    <section id="detail-sheet" class="sheet sheet-wide" hidden aria-labelledby="detail-title" role="dialog" aria-modal="false">
+      <div class="panel-head">
+        <div>
+          <p class="eyebrow">Technical detail</p>
+          <h2 id="detail-title">Geometry and model evidence</h2>
+        </div>
+        <button id="detail-close" class="icon-button" type="button" aria-label="Close details">×</button>
+      </div>
+      <div id="detail-content" class="detail-content"></div>
+    </section>
+
+    <section id="report-sheet" class="sheet" hidden aria-labelledby="report-title" role="dialog" aria-modal="false">
+      <div class="panel-head">
+        <div>
+          <p class="eyebrow">Community report</p>
+          <h2 id="report-title">Report a hazard</h2>
+        </div>
+        <button id="report-close" class="icon-button" type="button" aria-label="Close report form">×</button>
+      </div>
+      <form id="report-form" class="stack">
+        <label for="report-category">Category
+          <select id="report-category" required>
+            <option value="pothole">Pothole</option>
+            <option value="debris">Debris</option>
+            <option value="waterlogging">Waterlogging</option>
+            <option value="poor_visibility">Poor visibility</option>
+            <option value="sharp_curve">Sharp curve</option>
+            <option value="road_work">Road work</option>
+            <option value="other">Other</option>
+          </select>
+        </label>
+        <label for="report-description">Short description <span class="optional">(optional)</span>
+          <textarea id="report-description" maxlength="500" rows="3" placeholder="What should another rider know?"></textarea>
+        </label>
+        <fieldset class="location-choice">
+          <legend>Location</legend>
+          <label><input type="radio" name="report-location" value="current_location" checked> Use current GPS fix</label>
+          <label><input type="radio" name="report-location" value="map_pin"> Use map pin</label>
+        </fieldset>
+        <button id="report-pick" class="secondary" type="button">Pick location on map</button>
+        <p id="report-coords" class="hint">No GPS fix yet.</p>
+        <p class="hint">Reports are labelled unverified until an administrator reviews them. Do not report while riding.</p>
+        <p id="report-message" class="form-message" role="alert" hidden></p>
+        <div class="form-actions">
+          <button id="report-submit" class="primary" type="submit">Submit report</button>
+          <button id="report-cancel" type="button" class="secondary">Cancel</button>
+        </div>
+      </form>
+    </section>
+
+    <section id="account-sheet" class="sheet" hidden aria-labelledby="account-title" role="dialog" aria-modal="false">
+      <div class="panel-head">
+        <div>
+          <p class="eyebrow">Your account</p>
+          <h2 id="account-title">Account</h2>
+        </div>
+        <button id="account-close" class="icon-button" type="button" aria-label="Close account">×</button>
+      </div>
+      <p id="account-email" class="account-email">Not signed in</p>
+      <p id="account-role" class="hint"></p>
+      <div class="stack">
+        <a id="account-admin-link" class="button-link" href="/admin" hidden>Open admin console</a>
+        <button id="logout-button" type="button" class="secondary" hidden>Sign out</button>
+        <button id="delete-account-button" type="button" class="danger-outline" hidden>Delete account</button>
+        <p class="hint">Deleting your account removes your sessions and votes. Verified community reports are anonymised, not deleted.</p>
+      </div>
+    </section>
+
+    <section id="settings-sheet" class="sheet" hidden aria-labelledby="settings-title" role="dialog" aria-modal="false">
+      <div class="panel-head">
+        <div>
+          <p class="eyebrow">Device preferences</p>
+          <h2 id="settings-title">Alert settings</h2>
+        </div>
+        <button id="settings-close" class="icon-button" type="button" aria-label="Close settings">×</button>
+      </div>
+      <p class="hint">Advisory based on mapped road shape; not an accident warning. Choose which alert channels this device may use.</p>
+      <div class="settings-list">
+        <label class="setting-row" for="setting-visual">
+          <span>Visual flash</span>
+          <input id="setting-visual" type="checkbox">
+        </label>
+        <label class="setting-row" for="setting-haptic">
+          <span>Vibration</span>
+          <input id="setting-haptic" type="checkbox">
+        </label>
+        <label class="setting-row" for="setting-audio">
+          <span>Sound cue</span>
+          <input id="setting-audio" type="checkbox">
+        </label>
+        <button id="test-audio-button" class="secondary" type="button">Test sound cue</button>
+      </div>
+      <p id="settings-note" class="hint" role="status" aria-live="polite"></p>
+    </section>
+
+    <section id="trip-sheet" class="sheet" hidden aria-labelledby="trip-title" role="dialog" aria-modal="false">
+      <div class="panel-head">
+        <div>
+          <p class="eyebrow">Trip summary</p>
+          <h2 id="trip-title">Advisory session ended</h2>
+        </div>
+        <button id="trip-close" class="icon-button" type="button" aria-label="Close trip summary">×</button>
+      </div>
+      <div id="trip-content" class="detail-content"></div>
+    </section>
+
+    <dialog id="auth-dialog" class="auth-dialog" aria-labelledby="auth-title">
+      <form id="auth-form" class="stack" method="dialog">
+        <div class="panel-head">
+          <h2 id="auth-title">Sign in</h2>
+          <button id="auth-cancel" class="icon-button" type="button" aria-label="Close sign in">×</button>
+        </div>
+        <p id="auth-mode-note" class="hint">Sign in to report hazards and confirm community reports.</p>
+        <label for="auth-email">Email
+          <input id="auth-email" type="email" autocomplete="email" required maxlength="254">
+        </label>
+        <label for="auth-password">Password
+          <input id="auth-password" type="password" autocomplete="current-password" required minlength="10" maxlength="200">
+        </label>
+        <p id="auth-error" class="form-message" role="alert" hidden></p>
+        <div class="form-actions">
+          <button id="auth-submit" class="primary" type="submit">Sign in</button>
+          <button id="auth-switch" type="button" class="secondary">Create an account</button>
+        </div>
+        <p class="hint">No tokens are stored in the page. Sessions use an HttpOnly cookie.</p>
+      </form>
+    </dialog>
+
+    <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+    <p id="connection-banner" class="connection-banner" hidden>You are offline. Search, routing, and hazard updates are unavailable.</p>
+  </main>
+
+  <noscript><p class="noscript">RoadGuard AI needs JavaScript for the map and live advisories.</p></noscript>
+  <script src="/static/vendor/leaflet/leaflet.js"></script>
+  <script type="module" src="/static/app.js"></script>
+</body>
+</html>

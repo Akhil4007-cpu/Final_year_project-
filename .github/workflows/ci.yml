@@ -1,0 +1,83 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install deps (incl. dev tooling)
+        run: pip install -r requirements-dev.txt
+
+      - name: Lint (ruff)
+        run: ruff check app ml scripts tests
+
+      - name: Type check (mypy)
+        run: mypy app ml scripts --ignore-missing-imports
+
+      - name: Dependency audit (pip-audit)
+        run: pip-audit -r requirements.txt
+
+      - name: Tests
+        run: python -m pytest -q
+
+      - name: Compliance rules (R2/R4/R8/R10)
+        run: python -m pytest tests/test_compliance.py -q
+
+  frontend-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"   # matches the local run that verified these 23 cases
+
+      - name: JS unit tests (Node built-in runner, no npm/build step)
+        run: node --test "tests/js/**/*.test.js"
+
+  e2e:
+    # Rider-app Playwright E2E (mock-labelled providers): boots the real ASGI app and
+    # drives the frontend nav state machine + layout in headless Chromium.
+    needs: [test]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install Python deps (uvicorn app server)
+        run: pip install -r requirements.txt
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+
+      - name: Install Playwright + Chromium
+        run: |
+          npm ci
+          npx playwright install --with-deps chromium
+
+      - name: Rider-app E2E (mock-labelled providers)
+        run: npx playwright test
+
+  build:
+    needs: [test, e2e]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Docker build
+        run: docker build -t roadguard:ci .

@@ -1,0 +1,29 @@
+{
+  "generator_version": "generator_v1",
+  "geometry_version": "geo_v1",
+  "label_version": "label_v1",
+  "seed": 42,
+  "scenario_types": [
+    "straight",
+    "simple_arc",
+    "spiral",
+    "reverse_curve",
+    "compound",
+    "hairpin",
+    "urban_turn"
+  ],
+  "row_count": 1180,
+  "split_counts": {
+    "train": 643,
+    "test": 144,
+    "calibration": 151,
+    "ood_radius": 102,
+    "ood_type": 140
+  },
+  "dataset_sha256": "5e92447a370b2646c8929a434a577f9decf5694afb28e3c2d76ce93415d5db9d",
+  "ood_scenario_type": "hairpin",
+  "ood_radius_band_m": [
+    300.0,
+    700.0
+  ]
+}

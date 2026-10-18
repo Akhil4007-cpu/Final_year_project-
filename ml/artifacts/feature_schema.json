@@ -1,0 +1,146 @@
+{
+  "feature_names": [
+    "is_curve",
+    "length_m",
+    "curve_length_m",
+    "log_radius",
+    "inverse_min_radius",
+    "heading_change_deg",
+    "heading_change_per_m",
+    "curvature_std",
+    "max_turn_deg",
+    "transition_abruptness",
+    "spiral_like",
+    "gap_before_m",
+    "sequence_index",
+    "speed_mps",
+    "speed_missing",
+    "road_class_code",
+    "road_class_missing",
+    "grade_pct",
+    "grade_missing",
+    "geometry_quality",
+    "median_spacing_m",
+    "physics_prior"
+  ],
+  "features": [
+    {
+      "name": "is_curve",
+      "default": 0.0,
+      "description": "1 for a curve section"
+    },
+    {
+      "name": "length_m",
+      "default": 0.0,
+      "description": "Section length in metres"
+    },
+    {
+      "name": "curve_length_m",
+      "default": 0.0,
+      "description": "Curve length in metres"
+    },
+    {
+      "name": "log_radius",
+      "default": 9.210440366976517,
+      "description": "log(1 + effective radius)"
+    },
+    {
+      "name": "inverse_min_radius",
+      "default": 0.0,
+      "description": "1 / minimum radius, 0 for straights"
+    },
+    {
+      "name": "heading_change_deg",
+      "default": 0.0,
+      "description": "Absolute heading change over the section"
+    },
+    {
+      "name": "heading_change_per_m",
+      "default": 0.0,
+      "description": "Heading change per metre"
+    },
+    {
+      "name": "curvature_std",
+      "default": 0.0,
+      "description": "Std-dev of curvature samples"
+    },
+    {
+      "name": "max_turn_deg",
+      "default": 0.0,
+      "description": "Largest single-vertex turn"
+    },
+    {
+      "name": "transition_abruptness",
+      "default": 1.0,
+      "description": "0 = gradual spiral-like, 1 = abrupt"
+    },
+    {
+      "name": "spiral_like",
+      "default": 0.0,
+      "description": "1 when curvature changes monotonically"
+    },
+    {
+      "name": "gap_before_m",
+      "default": 500.0,
+      "description": "Distance from the previous curve, capped at 500 m"
+    },
+    {
+      "name": "sequence_index",
+      "default": 0.0,
+      "description": "Curve order on the route, capped at 10"
+    },
+    {
+      "name": "speed_mps",
+      "default": 13.88888888888889,
+      "description": "Speed band in m/s"
+    },
+    {
+      "name": "speed_missing",
+      "default": 1.0,
+      "description": "1 when speed was not supplied"
+    },
+    {
+      "name": "road_class_code",
+      "default": 0.0,
+      "description": "Ordinal road-class code"
+    },
+    {
+      "name": "road_class_missing",
+      "default": 1.0,
+      "description": "1 when road class was not supplied"
+    },
+    {
+      "name": "grade_pct",
+      "default": 0.0,
+      "description": "Real elevation grade in percent, 0 when missing"
+    },
+    {
+      "name": "grade_missing",
+      "default": 1.0,
+      "description": "1 when real elevation was not available"
+    },
+    {
+      "name": "geometry_quality",
+      "default": 1.0,
+      "description": "Upstream geometry quality score 0..1"
+    },
+    {
+      "name": "median_spacing_m",
+      "default": 20.0,
+      "description": "Median polyline spacing"
+    },
+    {
+      "name": "physics_prior",
+      "default": 0.0,
+      "description": "label_v1 challenge score computed from the SAME (possibly degraded) features; a transparent v^2/R prior the model corrects, never the clean reference label"
+    }
+  ],
+  "monotonic_constraints": {
+    "is_curve": 1,
+    "log_radius": -1,
+    "inverse_min_radius": 1,
+    "speed_mps": 1,
+    "physics_prior": 1
+  },
+  "label_version": "label_v1"
+}

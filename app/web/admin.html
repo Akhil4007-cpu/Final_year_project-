@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0f3d2e">
+  <meta name="robots" content="noindex, nofollow">
+  <title>RoadGuard AI — Admin</title>
+  <link rel="icon" href="/static/vendor/mark.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body class="admin-body">
+  <header class="topbar">
+    <a class="brand" href="/" aria-label="RoadGuard AI rider app">
+      <img class="brand-mark" src="/static/vendor/mark.svg" alt="" width="28" height="28">
+      <span class="brand-name">RoadGuard</span><span class="brand-ai">AI</span>
+    </a>
+    <div class="topbar-actions">
+      <span id="admin-user-chip" class="chip" hidden></span>
+      <button id="refresh-button" class="icon-button" type="button" aria-label="Refresh current section" title="Refresh" hidden>
+        <svg viewBox="0 0 24 24" width="21" height="21" aria-hidden="true"><path fill="currentColor" d="M17.7 6.3A8 8 0 1 0 20 12h-2a6 6 0 1 1-1.8-4.3L13 11h8V3l-3.3 3.3Z"/></svg>
+      </button>
+      <button id="logout-button" class="icon-button" type="button" aria-label="Sign out" title="Sign out" hidden>
+        <svg viewBox="0 0 24 24" width="21" height="21" aria-hidden="true"><path fill="currentColor" d="M10 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h5v-2H5V5h5V3Zm6.6 5.4L15.2 9.8l2.2 2.2H9v2h8.4l-2.2 2.2 1.4 1.4L21 12l-4.4-3.6Z"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <div class="admin-shell">
+    <section id="login-view" hidden aria-labelledby="login-title">
+      <div class="admin-login stack">
+        <div>
+          <p class="eyebrow">RoadGuard AI</p>
+          <h1 id="login-title">Administrator sign in</h1>
+          <p class="hint">This console reviews community reports, manages accounts, and inspects system and model state. Rider self-registration does not create administrator accounts.</p>
+        </div>
+        <form id="login-form" class="stack">
+          <label for="login-email">Email
+            <input id="login-email" type="email" autocomplete="username" maxlength="254" required>
+          </label>
+          <label for="login-password">Password
+            <input id="login-password" type="password" autocomplete="current-password" maxlength="200" required>
+          </label>
+          <p id="login-message" class="form-message" role="alert" hidden></p>
+          <button id="login-submit" class="primary" type="submit">Sign in</button>
+        </form>
+        <p class="hint"><a href="/">Return to the rider app</a></p>
+      </div>
+    </section>
+
+    <section id="denied-view" hidden aria-labelledby="denied-title">
+      <div class="admin-card">
+        <p class="eyebrow">Access control</p>
+        <h1 id="denied-title">Administrator access required</h1>
+        <p id="denied-copy" class="hint"></p>
+        <div class="form-actions denied-actions">
+          <a class="button-link" href="/">Back to rider app</a>
+          <button id="denied-logout" class="secondary" type="button">Sign out</button>
+        </div>
+      </div>
+    </section>
+
+    <div id="console-view" hidden>
+      <div class="admin-header">
+        <div>
+          <p class="eyebrow">Operations</p>
+          <h1>Admin console</h1>
+        </div>
+        <p class="hint">Community reports need review. Model metrics come from synthetic training data, not live roads or traffic.</p>
+      </div>
+
+      <nav class="admin-nav" aria-label="Admin sections">
+        <button type="button" data-tab="overview" aria-current="page">Overview</button>
+        <button type="button" data-tab="hazards">Hazards</button>
+        <button type="button" data-tab="users">Users</button>
+        <button type="button" data-tab="audit">Audit</button>
+        <button type="button" data-tab="system">System</button>
+      </nav>
+
+      <main id="admin-main">
+        <section id="tab-overview" aria-label="Overview">
+          <div id="overview-stats" class="admin-grid"></div>
+          <div class="admin-card">
+            <div class="admin-card-head">
+              <div>
+                <h2>Recent audit activity</h2>
+                <p class="hint">Latest 10 recorded actions. Audit entries are append-only in the application.</p>
+              </div>
+            </div>
+            <div id="overview-recent"><p class="admin-message">Loading…</p></div>
+          </div>
+          <div id="overview-model" class="admin-card"></div>
+        </section>
+
+        <section id="tab-hazards" aria-label="Hazard moderation" hidden>
+          <div class="admin-toolbar">
+            <label for="hazard-status">Status
+              <select id="hazard-status">
+                <option value="">All statuses</option>
+                <option value="unverified">Unverified</option>
+                <option value="verified">Verified</option>
+                <option value="rejected">Rejected</option>
+                <option value="expired">Expired</option>
+              </select>
+            </label>
+            <label for="hazard-limit">Rows
+              <select id="hazard-limit">
+                <option value="50">50</option>
+                <option value="200" selected>200</option>
+                <option value="500">500</option>
+              </select>
+            </label>
+          </div>
+          <div class="admin-card">
+            <div class="admin-card-head">
+              <div>
+                <h2>Community hazard reports</h2>
+                <p class="hint">Reports are user submissions. Verification records an administrative review of the report, not a field inspection of the road.</p>
+              </div>
+            </div>
+            <div id="hazards-content"><p class="admin-message">Loading…</p></div>
+          </div>
+        </section>
+
+        <section id="tab-users" aria-label="User management" hidden>
+          <div class="admin-card">
+            <div class="admin-card-head">
+              <div>
+                <h2>User accounts</h2>
+                <p class="hint">Deactivating an account revokes its sessions and blocks sign-in. Account deletion is available to the account holder in the rider app.</p>
+              </div>
+            </div>
+            <div id="users-content"><p class="admin-message">Loading…</p></div>
+          </div>
+        </section>
+
+        <section id="tab-audit" aria-label="Audit log" hidden>
+          <div class="admin-toolbar">
+            <label for="audit-limit">Rows
+              <select id="audit-limit">
+                <option value="50">50</option>
+                <option value="100" selected>100</option>
+                <option value="250">250</option>
+                <option value="500">500</option>
+              </select>
+            </label>
+          </div>
+          <div class="admin-card">
+            <div class="admin-card-head">
+              <div>
+                <h2>Audit log</h2>
+                <p class="hint">Recorded actions with actor, target, and stored details. Secrets and session tokens are never written here.</p>
+              </div>
+            </div>
+            <div id="audit-content"><p class="admin-message">Loading…</p></div>
+          </div>
+        </section>
+
+        <section id="tab-system" aria-label="System status" hidden>
+          <div id="system-content"><p class="admin-message">Loading…</p></div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <dialog id="moderate-dialog" class="auth-dialog admin-dialog" aria-labelledby="moderate-title">
+    <form id="moderate-form" class="stack">
+      <div class="panel-head">
+        <div>
+          <p class="eyebrow">Moderation</p>
+          <h2 id="moderate-title">Verify hazard report</h2>
+        </div>
+        <button id="moderate-close" class="icon-button" type="button" aria-label="Close moderation dialog">×</button>
+      </div>
+      <p id="moderate-summary" class="hint"></p>
+      <label for="moderate-note">Internal note (optional)
+        <textarea id="moderate-note" maxlength="500" rows="3" placeholder="Why is this report being verified or rejected?"></textarea>
+      </label>
+      <p class="hint">The note is stored in the audit log. It is not shown as a public confirmation.</p>
+      <p id="moderate-message" class="form-message" role="alert" hidden></p>
+      <div class="form-actions">
+        <button id="moderate-submit" class="primary" type="submit">Verify</button>
+        <button id="moderate-cancel" class="secondary" type="button">Cancel</button>
+      </div>
+    </form>
+  </dialog>
+
+  <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+  <noscript><p class="noscript">The admin console needs JavaScript.</p></noscript>
+  <script type="module" src="/static/admin.js"></script>
+</body>
+</html>

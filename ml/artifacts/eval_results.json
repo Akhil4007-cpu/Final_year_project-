@@ -1,0 +1,328 @@
+{
+  "clean": {
+    "count": 156,
+    "mae": 0.573,
+    "rmse": 1.827,
+    "r2": 0.9948,
+    "baseline_mae": 0.089,
+    "baseline_rmse": 0.222,
+    "ml_minus_baseline_mae": 0.484
+  },
+  "degraded": {
+    "count": 144,
+    "mae": 14.142,
+    "rmse": 18.809,
+    "r2": 0.3804,
+    "baseline_mae": 27.826,
+    "baseline_rmse": 35.654,
+    "ml_minus_baseline_mae": -13.684
+  },
+  "ood_type": {
+    "count": 140,
+    "mae": 20.307,
+    "rmse": 25.033,
+    "r2": -1.4145,
+    "baseline_mae": 12.647,
+    "baseline_rmse": 17.134,
+    "ml_minus_baseline_mae": 7.66
+  },
+  "ood_radius": {
+    "count": 102,
+    "mae": 14.994,
+    "rmse": 19.651,
+    "r2": -5.7896,
+    "baseline_mae": 43.287,
+    "baseline_rmse": 50.902,
+    "ml_minus_baseline_mae": -28.293
+  },
+  "noise_sweep_mae": {
+    "ml": {
+      "0.0": 0.573,
+      "3.0": 13.247,
+      "6.0": 16.435,
+      "10.0": 19.365,
+      "15.0": 18.299,
+      "20.0": 23.589
+    },
+    "baseline": {
+      "0.0": 0.089,
+      "3.0": 33.723,
+      "6.0": 40.936,
+      "10.0": 39.588,
+      "15.0": 36.784,
+      "20.0": 34.607
+    }
+  },
+  "missing_sweep_mae": [
+    {
+      "fraction": 0.0,
+      "mae": 2.055,
+      "baseline_mae": 1.79
+    },
+    {
+      "fraction": 0.25,
+      "mae": 3.429,
+      "baseline_mae": 2.752
+    },
+    {
+      "fraction": 0.5,
+      "mae": 4.507,
+      "baseline_mae": 3.451
+    },
+    {
+      "fraction": 0.75,
+      "mae": 5.047,
+      "baseline_mae": 4.05
+    },
+    {
+      "fraction": 1.0,
+      "mae": 5.552,
+      "baseline_mae": 4.472
+    }
+  ],
+  "categories": {
+    "primary": {
+      "count": 40,
+      "mae": 14.049,
+      "baseline_mae": 25.224
+    },
+    "residential": {
+      "count": 27,
+      "mae": 9.855,
+      "baseline_mae": 22.125
+    },
+    "secondary": {
+      "count": 37,
+      "mae": 15.668,
+      "baseline_mae": 36.917
+    },
+    "tertiary": {
+      "count": 40,
+      "mae": 15.716,
+      "baseline_mae": 25.867
+    }
+  },
+  "candidates": {
+    "decision_tree": {
+      "count": 144,
+      "mae": 14.609,
+      "rmse": 20.022,
+      "r2": 0.2979,
+      "baseline_mae": 27.826,
+      "baseline_rmse": 35.654,
+      "ml_minus_baseline_mae": -13.217
+    },
+    "random_forest": {
+      "count": 144,
+      "mae": 13.256,
+      "rmse": 17.454,
+      "r2": 0.4665,
+      "baseline_mae": 27.826,
+      "baseline_rmse": 35.654,
+      "ml_minus_baseline_mae": -14.57
+    },
+    "hist_gradient_boosting": {
+      "count": 144,
+      "mae": 14.142,
+      "rmse": 18.809,
+      "r2": 0.3804,
+      "baseline_mae": 27.826,
+      "baseline_rmse": 35.654,
+      "ml_minus_baseline_mae": -13.684
+    }
+  },
+  "monotonic_checks": {
+    "decision_tree": {
+      "passed": true,
+      "radius_violations": 0,
+      "speed_violations": 0,
+      "radius_points": 40,
+      "speed_points": 20
+    },
+    "random_forest": {
+      "passed": true,
+      "radius_violations": 0,
+      "speed_violations": 0,
+      "radius_points": 40,
+      "speed_points": 20
+    },
+    "hist_gradient_boosting": {
+      "passed": true,
+      "radius_violations": 0,
+      "speed_violations": 0,
+      "radius_points": 40,
+      "speed_points": 20
+    }
+  },
+  "uncertainty_coverage": {
+    "nominal_coverage": 0.8,
+    "empirical_coverage": 0.8403,
+    "mean_width": 49.467
+  },
+  "ood_type_uncertainty": {
+    "nominal_coverage": 0.8,
+    "empirical_coverage": 0.6786,
+    "mean_width": 50.59
+  },
+  "ood_radius_uncertainty": {
+    "nominal_coverage": 0.8,
+    "empirical_coverage": 0.8333,
+    "mean_width": 51.092
+  },
+  "feature_importance": {
+    "max_turn_deg": 0.8162,
+    "heading_change_per_m": 0.1239,
+    "geometry_quality": 0.1113,
+    "road_class_code": 0.0997,
+    "length_m": 0.0322,
+    "speed_mps": 0.0253,
+    "inverse_min_radius": 0.0102,
+    "gap_before_m": 0.0093,
+    "physics_prior": 0.009,
+    "grade_pct": 0.0053,
+    "sequence_index": 0.0021,
+    "is_curve": 0.0,
+    "spiral_like": 0.0,
+    "log_radius": -0.0001,
+    "road_class_missing": -0.0018,
+    "grade_missing": -0.0028,
+    "transition_abruptness": -0.0029,
+    "speed_missing": -0.0109,
+    "curve_length_m": -0.023,
+    "heading_change_deg": -0.0235,
+    "curvature_std": -0.0267,
+    "median_spacing_m": -0.0299
+  },
+  "seed_stability": {
+    "seeds": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "mae_values": [
+      14.1418,
+      14.1418,
+      14.1418,
+      14.1418,
+      14.1418
+    ],
+    "mean": 14.1418,
+    "std": 0.0,
+    "ci95_low": 14.1418,
+    "ci95_high": 14.1418
+  },
+  "latency": {
+    "repeats": 500,
+    "p50_ms": 5.0204,
+    "p95_ms": 6.623,
+    "max_ms": 9.2199
+  },
+  "leakage_audit": {
+    "train_test_scenario_overlap": 0,
+    "split_counts": {
+      "train": 643,
+      "test": 144,
+      "calibration": 151,
+      "ood_radius": 102,
+      "ood_type": 140
+    }
+  },
+  "model_selection": {
+    "selection": "hist_gradient_boosting::0",
+    "criteria": "monotonic_pass AND p95<=budget, then min CV MAE (train-only)",
+    "cv_scores": {
+      "decision_tree": {
+        "cv_mae": 6.0866,
+        "model_name": "decision_tree",
+        "hgb_config": null,
+        "monotonic_pass": true,
+        "p95_ms": 0.058,
+        "latency_budget_ms": 12.0,
+        "latency_pass": true
+      },
+      "random_forest": {
+        "cv_mae": 5.3579,
+        "model_name": "random_forest",
+        "hgb_config": null,
+        "monotonic_pass": true,
+        "p95_ms": 48.516,
+        "latency_budget_ms": 12.0,
+        "latency_pass": false
+      },
+      "hist_gradient_boosting::0": {
+        "cv_mae": 5.696,
+        "model_name": "hist_gradient_boosting",
+        "hgb_config": {
+          "max_iter": 400,
+          "learning_rate": 0.06,
+          "max_leaf_nodes": 31,
+          "l2_regularization": 0.1
+        },
+        "monotonic_pass": true,
+        "p95_ms": 11.145,
+        "latency_budget_ms": 12.0,
+        "latency_pass": true
+      },
+      "hist_gradient_boosting::1": {
+        "cv_mae": 5.8608,
+        "model_name": "hist_gradient_boosting",
+        "hgb_config": {
+          "max_iter": 800,
+          "learning_rate": 0.05,
+          "max_leaf_nodes": 63,
+          "l2_regularization": 0.05
+        },
+        "monotonic_pass": true,
+        "p95_ms": 12.104,
+        "latency_budget_ms": 12.0,
+        "latency_pass": false
+      },
+      "hist_gradient_boosting::2": {
+        "cv_mae": 5.9179,
+        "model_name": "hist_gradient_boosting",
+        "hgb_config": {
+          "max_iter": 1200,
+          "learning_rate": 0.04,
+          "max_leaf_nodes": 63,
+          "l2_regularization": 0.02
+        },
+        "monotonic_pass": true,
+        "p95_ms": 19.927,
+        "latency_budget_ms": 12.0,
+        "latency_pass": false
+      }
+    }
+  },
+  "selected_hgb_config": {
+    "max_iter": 400,
+    "learning_rate": 0.06,
+    "max_leaf_nodes": 31,
+    "l2_regularization": 0.1
+  },
+  "prediction_mode": "physics_prior_plus_boosted_residual",
+  "prior_feature": "physics_prior",
+  "train_augmentation": {
+    "degraded_rows": 643,
+    "clean_rows": 658,
+    "clean_emphasis": 3,
+    "clean_fit_rows": 1974,
+    "mild_rows": 647,
+    "total_fit_rows": 3264,
+    "target": "label - physics_prior (residual)",
+    "note": "clean+mild rows drawn from train-split scenarios only; test never used for fitting"
+  },
+  "production_model": "hist_gradient_boosting",
+  "eligible_models": [
+    "decision_tree",
+    "random_forest",
+    "hist_gradient_boosting"
+  ],
+  "train_rows": 643,
+  "calibration_rows": 151,
+  "test_rows": 144,
+  "ood_type_rows": 140,
+  "ood_radius_rows": 102,
+  "conformal_offset": 26.3
+}

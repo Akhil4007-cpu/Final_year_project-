@@ -1,0 +1,175 @@
+{
+  "seeds": [
+    42,
+    43,
+    44,
+    45,
+    46
+  ],
+  "per_seed": [
+    {
+      "seed": 42,
+      "production_model": "hist_gradient_boosting",
+      "clean_r2": 0.9948,
+      "clean_mae": 0.573,
+      "degraded_mae": 14.142,
+      "degraded_baseline_mae": 27.826,
+      "ood_radius_mae": 14.994,
+      "ood_radius_baseline_mae": 43.287,
+      "ood_type_mae": 20.307,
+      "ood_type_baseline_mae": 12.647,
+      "empirical_coverage": 0.8403,
+      "latency_p50_ms": 7.8003,
+      "latency_p95_ms": 11.575,
+      "monotonic_pass": true,
+      "leakage_overlap": 0
+    },
+    {
+      "seed": 43,
+      "production_model": "hist_gradient_boosting",
+      "clean_r2": 0.999,
+      "clean_mae": 0.425,
+      "degraded_mae": 15.531,
+      "degraded_baseline_mae": 29.556,
+      "ood_radius_mae": 14.358,
+      "ood_radius_baseline_mae": 43.878,
+      "ood_type_mae": 18.421,
+      "ood_type_baseline_mae": 13.442,
+      "empirical_coverage": 0.76,
+      "latency_p50_ms": 6.6924,
+      "latency_p95_ms": 10.0021,
+      "monotonic_pass": true,
+      "leakage_overlap": 0
+    },
+    {
+      "seed": 44,
+      "production_model": "hist_gradient_boosting",
+      "clean_r2": 0.9971,
+      "clean_mae": 0.398,
+      "degraded_mae": 13.88,
+      "degraded_baseline_mae": 27.289,
+      "ood_radius_mae": 16.074,
+      "ood_radius_baseline_mae": 43.741,
+      "ood_type_mae": 18.557,
+      "ood_type_baseline_mae": 12.84,
+      "empirical_coverage": 0.8239,
+      "latency_p50_ms": 6.333,
+      "latency_p95_ms": 8.5132,
+      "monotonic_pass": true,
+      "leakage_overlap": 0
+    },
+    {
+      "seed": 45,
+      "production_model": "hist_gradient_boosting",
+      "clean_r2": 0.9979,
+      "clean_mae": 0.542,
+      "degraded_mae": 12.461,
+      "degraded_baseline_mae": 27.418,
+      "ood_radius_mae": 17.472,
+      "ood_radius_baseline_mae": 46.369,
+      "ood_type_mae": 17.938,
+      "ood_type_baseline_mae": 12.266,
+      "empirical_coverage": 0.8477,
+      "latency_p50_ms": 5.2547,
+      "latency_p95_ms": 7.3654,
+      "monotonic_pass": true,
+      "leakage_overlap": 0
+    },
+    {
+      "seed": 46,
+      "production_model": "hist_gradient_boosting",
+      "clean_r2": 0.9988,
+      "clean_mae": 0.439,
+      "degraded_mae": 13.979,
+      "degraded_baseline_mae": 29.276,
+      "ood_radius_mae": 16.58,
+      "ood_radius_baseline_mae": 47.364,
+      "ood_type_mae": 22.056,
+      "ood_type_baseline_mae": 11.584,
+      "empirical_coverage": 0.8146,
+      "latency_p50_ms": 4.9993,
+      "latency_p95_ms": 6.8176,
+      "monotonic_pass": true,
+      "leakage_overlap": 0
+    }
+  ],
+  "clean_r2": {
+    "mean": 0.9975,
+    "std": 0.0017,
+    "ci95_low": 0.996,
+    "ci95_high": 0.999,
+    "n": 5
+  },
+  "clean_mae": {
+    "mean": 0.4754,
+    "std": 0.0772,
+    "ci95_low": 0.4078,
+    "ci95_high": 0.543,
+    "n": 5
+  },
+  "degraded_mae": {
+    "mean": 13.9986,
+    "std": 1.0894,
+    "ci95_low": 13.0437,
+    "ci95_high": 14.9535,
+    "n": 5
+  },
+  "degraded_baseline_mae": {
+    "mean": 28.273,
+    "std": 1.0667,
+    "ci95_low": 27.338,
+    "ci95_high": 29.208,
+    "n": 5
+  },
+  "ood_radius_mae": {
+    "mean": 15.8956,
+    "std": 1.2412,
+    "ci95_low": 14.8076,
+    "ci95_high": 16.9836,
+    "n": 5
+  },
+  "ood_radius_baseline_mae": {
+    "mean": 44.9278,
+    "std": 1.8176,
+    "ci95_low": 43.3346,
+    "ci95_high": 46.521,
+    "n": 5
+  },
+  "ood_type_mae": {
+    "mean": 19.4558,
+    "std": 1.7079,
+    "ci95_low": 17.9587,
+    "ci95_high": 20.9529,
+    "n": 5
+  },
+  "ood_type_baseline_mae": {
+    "mean": 12.5558,
+    "std": 0.6897,
+    "ci95_low": 11.9512,
+    "ci95_high": 13.1604,
+    "n": 5
+  },
+  "empirical_coverage": {
+    "mean": 0.8173,
+    "std": 0.0346,
+    "ci95_low": 0.787,
+    "ci95_high": 0.8476,
+    "n": 5
+  },
+  "latency_p50_ms": {
+    "mean": 6.2159,
+    "std": 1.1352,
+    "ci95_low": 5.2209,
+    "ci95_high": 7.211,
+    "n": 5
+  },
+  "latency_p95_ms": {
+    "mean": 8.8547,
+    "std": 1.9494,
+    "ci95_low": 7.1459,
+    "ci95_high": 10.5634,
+    "n": 5
+  },
+  "all_monotonic_pass": true,
+  "max_leakage_overlap": 0
+}

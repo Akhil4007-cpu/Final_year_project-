@@ -1,0 +1,13 @@
+{
+  "name": "roadguard-web",
+  "private": true,
+  "type": "module",
+  "description": "ESM signal for the no-build frontend and its Node test runner. No runtime npm dependencies; one dev-only dependency (@playwright/test) for the E2E suite.",
+  "scripts": {
+    "test:js": "node --test \"tests/js/**/*.test.js\"",
+    "test:e2e": "playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.64.1"
+  }
+}
