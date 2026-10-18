@@ -33,12 +33,18 @@ Three layers behind one ASGI app ([ARCHITECTURE.md](ARCHITECTURE.md)):
   admin. Security headers middleware, CSP, `X-RoadGuard-Client` CSRF-by-header on writes.
 
 ## 3. Research findings + verified references
-11 sources verified with URL + access date 2026-10-17
+11 numbered sources verified with URL + access date 2026-10-17
 ([REFERENCES_VERIFIED.md](REFERENCES_VERIFIED.md),
 [RESEARCH_LITERATURE_REVIEW.md](RESEARCH_LITERATURE_REVIEW.md)): FHWA-HRT-13-077, Nadimi 2025,
 telematics surrogate-measure / harsh-event papers, proactive curve-assessment papers, OSM/ODbL,
 OSRM docs, MDN Geolocation, map-matching, synthetic-data limits, spatial CV/leakage, uncertainty
-communication, interpretable tabular ML. **No paper establishes accident-probability prediction
+communication, interpretable tabular ML. Two of them were **re-checked at the publisher on
+2026-10-18**: FHWA-HRT-13-077 against the ROSA P / National Transportation Library record
+(title, report number, Bauer & Harwood et al., 2014-01-01) and Nadimi 2025 against the Crossref
+DOI record (10.1038/s41598-025-97384-7, *Scientific Reports*, 2025-04-11, Nadimi/Fathipour/
+Sheykhfard — the full title is "…surrogate safety measures and machine learning"); the nature.com
+HTML page itself could not be machine-read here (bot interstitial), which is recorded in the file.
+**No paper establishes accident-probability prediction
 for mapped road geometry on Indian roads** — this bounds what RoadGuard may claim.
 
 ## 4. Gap + contribution
@@ -53,9 +59,10 @@ in [GEOMETRY_ML_DESIGN.md](GEOMETRY_ML_DESIGN.md); limits in
 Geometry (`test_geo` 15), baseline (`test_baseline` 10), aggregation (`test_aggregation` 10),
 advisory (`test_advisory` 6), security/auth (`test_security` 15), model/GACE runtime
 (`test_model` 13 incl. batch-vs-per-section equivalence), API (`test_api` 18, `test_api_routes`
-6), staged-alert wiring (`test_web_alerts` 4), compliance (`test_compliance` 7), DB backup/restore
-(`test_db_backup` 1). Frontend: rider app (`app/web/app.js` 1825 lines) + admin console
-(`admin.js` 827) + pure alert planner (`alerts.js`, `settings.js`).
+6), staged-alert + speed-advisory + deviation wiring (`test_web_alerts` 7), disagreement-fallback
+audit (`test_fallback_audit` 4), compliance (`test_compliance` 7), DB backup/restore
+(`test_db_backup` 1). Frontend: rider app (`app/web/app.js`) + admin console
+(`admin.js`) + pure alert planner and speed layer (`alerts.js`, `settings.js`).
 
 ## 6. Removed modules + reasons
 No accident-probability or "safety-score" module was ever built (R4). Raw internal scores are not
@@ -88,12 +95,42 @@ baseline** there. The "ML must beat baseline on the noise test" justification ga
 for noise ≥ 3.0). Monotonic grid invariants pass on every seed (`all_monotonic_pass = true`);
 leakage overlap = 0 on every seed (`max_leakage_overlap = 0`).
 
+**What the guard actually serves** (`ml/artifacts/fallback_audit.json`, seed-42 production
+artifact, `threshold_retuned: false` — the threshold was **not** changed after seeing these
+results; the sweep below ran on the calibration split only):
+
+| Slice | n | fallback rate | served MAE | model-only MAE | baseline MAE |
+|---|---|---|---|---|---|
+| Clean | 156 | 0.64 % | 0.445 | 0.573 | 0.089 |
+| Degraded | 144 | 61.11 % | **27.252** | 14.142 | 27.826 |
+| OOD radius | 102 | 67.65 % | **42.394** | 14.994 | 43.287 |
+| OOD type (hairpin) | 140 | 66.43 % | **12.593** | 20.307 | 12.647 |
+| Noise @3 m | 156 | 72.44 % | **32.960** | 13.247 | 33.723 |
+
+Read honestly: the guard **helps only where the model is known to lose** (OOD type: served
+12.593 vs model-only 20.307, and 67/93 fallbacks were genuinely closer to the label), but on
+degraded / noise / OOD-radius it fires on 61–72 % of sections and pulls served error back to
+*baseline* level (degraded 27.252 vs model 14.142), because a large model-vs-baseline gap is a
+poor proxy for "the model is wrong there" (fallback precision 0.2045 degraded, 0.029 OOD-radius).
+So the "27.826 → 14.142" degraded improvement describes the **model**, not the **guarded
+output** a rider receives. Full write-up: [GEOMETRY_ML_LIMITATIONS.md](GEOMETRY_ML_LIMITATIONS.md).
+
+**Degraded-slice generalisation over 5 seeds** (`multi_seed_metrics.json`): MAE **13.9986
+(CI 13.0437–14.9535)**, RMSE **19.4270 (CI 18.5491–20.3049)**, **R² 0.3090 (CI 0.2432–0.3747)**
+against baseline MAE 28.2730 (CI 27.3380–29.2080). An R² of ≈0.31 on degraded input is the
+honest statement of the situation: the corrected model explains about a third of the variance
+the raw physics prior cannot, and it is nowhere near the clean-input R² of 0.9975.
+
 ## 9. Actual metrics + interpretation
 - Split-conformal coverage: nominal **0.80**; empirical seed-42 **0.8403**; 5-seed mean **0.8173
   (CI 0.787–0.8476)** — slightly above nominal, as expected for a conservative residual conformal
   band.
-- Inference latency (model scoring): seed-42 p50 **7.80 ms**, p95 **11.575 ms**; 5-seed p95 mean
-  **8.855 ms (CI 7.15–10.56)** — within the 12.0 ms budget (`LATENCY_BUDGET_P95_MS`).
+- Inference latency (model scoring, wall-clock on the dev machine): **re-measured 2026-10-18**
+  when the 5-seed run was re-executed for the degraded R²/CI figures — seed-42 p50 **5.27 ms**,
+  p95 **8.29 ms**; 5-seed p50 mean **5.2124 ms (CI 5.1723–5.2524)**, p95 mean **7.3937 ms
+  (CI 6.9307–7.8566)** — within the 12.0 ms budget (`LATENCY_BUDGET_P95_MS`). The previously
+  committed run read p50 6.2159 ms / p95 8.8547 ms; the shift is machine load, not a code change
+  (every deterministic metric in that re-run reproduced exactly).
 - Constants: `BASELINE_VERSION=physics_v2r_v1`, `LABEL_VERSION=label_v1`, `NOMINAL_COVERAGE=0.80`,
   `DISAGREEMENT_THRESHOLD=20.0`, `CACHE_LIMIT=256`.
 Model card: `ml/artifacts/MODEL_CARD.md`.
@@ -111,8 +148,15 @@ backup→restore tested to lose 0 rows + `PRAGMA integrity_check ok`. Full spec 
 Rider: map-first, mobile-first, GPS chip state machine, destination search, route card (distance/
 provider-ETA/band/coverage), staged advisories with visual+vibration+audio fallback, reduced-motion
 support, settings persisted to `localStorage`, assertive live-region escalation on high-band
-"in-curve". Admin: 5-tab console (overview/hazards/users/audit/system) with moderation dialog and
-role gating. Both are **no-build ES modules**. Standard wording enforced (see §12).
+"in-curve". The advisory card is **speed-aware**: when the device reports a ground speed it states
+the `v²/R` lateral demand in g and how many times that is of the band the score was computed at
+("At ~90 km/h (GPS) this 38 m curve needs 1.68 g lateral — 4.00× the 0.42 g scored band. Geometry
+indicator, not an accident probability."); when it does not, the card **discloses that the assumed
+band was kept** rather than inventing a number. It never outputs a target/allowed speed. Leaving the
+analysed polyline pauses advisories with an off-route note (accuracy-scaled threshold, two-fix
+latch). Admin: 5-tab console (overview/hazards/users/audit/system) with moderation dialog and
+role gating. Both are **no-build ES modules**. Standard wording enforced (see §12). Three 390 px
+rider captures (mock-labelled) are in [docs/screenshots/](screenshots/).
 
 ## 12. Security / privacy checks
 PBKDF2 password hashing, HttpOnly+SameSite cookies, server-side authz (role gates), input
@@ -125,15 +169,23 @@ probability" appears only in negations and never "safe route".
 
 ## 13. Test commands + results
 ```
-python -m pytest -q                 → 108 passed, 1 warning (Starlette/TestClient deprecation)
+python -m pytest -q                 → 112 passed, 1 warning (Starlette/TestClient deprecation)
 node --test "tests/js/**/*.test.js" → tests 31, pass 31, fail 0
-npx playwright test                 → 15 passed (10 rider + 5 admin) — all providers MOCKED (`mock`)
+npx playwright test                 → 17 passed (10 rider + 5 admin + 2 screenshot) — all providers MOCKED (`mock`)
 python -m ruff check app ml scripts tests                      → All checks passed!
-python -m mypy app ml scripts --ignore-missing-imports         → Success: no issues found in 29 files
-python -m pip_audit -r requirements.txt                        → 0 known vulnerabilities
+python -m mypy app ml scripts --ignore-missing-imports         → Success: no issues found in 31 source files
+python -m pip_audit -r requirements.txt                        → No known vulnerabilities found
+python -m pytest tests/test_compliance.py -q                   → 7 passed
 python scripts/bench_server.py                                 → docs/perf_server_bench.json (offline)
 python scripts/bench_provider_live.py --confirm                → docs/perf_provider_live.json (LIVE, opt-in)
+python scripts/real_route_check.py --confirm                   → docs/real_route_check.json (LIVE, opt-in, plausibility only)
+python -m ml.fallback_audit                                    → ml/artifacts/fallback_audit.json (offline)
 ```
+Which of these ran **in this session** (verbatim output in
+[LOOP_STATE.md](LOOP_STATE.md) → Gate log): pytest, `node --test`, Playwright, ruff, mypy,
+pip-audit, the compliance subset, `ml.fallback_audit`, and `real_route_check.py --confirm`
+(three times, identical aggregates). The two `bench_*` scripts were **not** re-run here; their
+figures are carried from the earlier recorded runs in `docs/perf_*.json`.
 Playwright E2E (`tests/e2e`) boots the real ASGI app via the config `webServer`; every `/api/v1/*`
 response is mocked and labelled `mock`; OSM tiles stubbed. Rider: startup (no JS errors),
 search→route (+ client header `web` asserted on the POST), nav lifecycle → trip summary, live-GPS
@@ -162,10 +214,26 @@ Full detail: [PERFORMANCE_REPORT.md](PERFORMANCE_REPORT.md).
 ## 15. Known limitations
 Synthetic-data-only training (no real road/accident labels); clean-input physics baseline is
 **more accurate** than the model (it only earns its keep under degradation/noise/OOD-radius);
+**and the runtime disagreement guard largely gives that advantage back on degraded input**
+(served degraded MAE 27.252 vs model-only 14.142, §8);
 hairpin OOD-type triggers baseline fallback; public OSRM/Nominatim demo limits mean **self-host or
 commercial routing is required before any public launch**; OSM geometry quality bounds the score;
 advisory is geometry-only (no surface condition, traffic, weather). See
 [LIMITATIONS.md](LIMITATIONS.md), [KNOWN_ISSUES.md](KNOWN_ISSUES.md).
+
+**Live plausibility check on real routes (labelled `live`, opt-in, not CI).** Five real
+Hyderabad pairs were pushed through the actual production path
+([REAL_ROUTE_CHECK.md](REAL_ROUTE_CHECK.md), `docs/real_route_check.json`): 5/5 geocoded and
+routed, **8 route records, 0 validation failures**, 1247 sections with 94.3 % scored, coverage
+95.7–98.3 %, all eight route-level bands `low`, and the disagreement guard fired on
+**182/1176 scored sections (15.5 %)** — far below the 61–72 % it reaches on the synthetic
+degraded slices. It also exposed the pipeline's weakest point on real data: **84 sections with
+radius < 25 m (15 under 10 m, minimum 3.96 m ≈ 5.0 g at the assumed 50 km/h band), and every
+one of those 84 was banded `high`** — i.e. 58.7 % of high-band sections on real geometry sit in
+an implausible tail produced by bunched OSRM vertices (all 8 records flagged `highly uneven
+point spacing`). **This is a plausibility check only: no ground truth exists for these routes,
+so no accuracy claim is made.** No minimum-radius floor was added, because that is a label
+decision requiring a re-train/re-eval cycle; it is recorded as KNOWN_ISSUES #12.
 
 ## 16. Remaining work / exit-gate status
 §14 gates, honestly:
@@ -177,19 +245,27 @@ advisory is geometry-only (no surface condition, traffic, weather). See
 - [x] Rules R1–R11: R2/R4/R8/R10 automated in `test_compliance` (7 green); rest documented, no
   accident-prediction claim anywhere.
 - [x] ML pipeline present, reproducible, honestly evaluated; no accident claim.
-- [x] Full test suite green (108 + 31 + 15), or documented: none failing.
+- [x] Full test suite green (112 backend + 31 JS-unit + 17 Playwright), or documented: none failing.
 - [~] "Clean-machine deploy works; CI green": commands verified locally except `docker build`
   (deferred) and runner execution (impossible here) — documented, not asserted.
-- [x] Docs match code; references verified (11, dated).
+- [x] Docs match code; references verified (11 numbered, dated; two publisher re-checks
+  2026-10-18).
+- [x] Version control: `main` with a first commit + small per-task commits; `.gitignore` covers
+  env/DB/secrets/venv/node_modules/test-results/scratch artifacts. **No remote configured,
+  nothing pushed** — that step is the student's own (README → Version control).
 - [x] Review 2 checklist complete except `REQUIRES STUDENT INPUT` rows (kept blank by design).
 - [~] Still open by choice/absence of environment: an in-suite `live`-labelled provider pytest
   (kept out of CI — network egress), `pyright` (mypy is authoritative and clean), multi-worker +
   CI-Playwright perf variants, admin-console responsive screenshot matrix at 6 widths.
 
 ## 17. Review 2 checklist
-See [REVIEW_2_PROJECT_SPECIFICATION.md](REVIEW_2_PROJECT_SPECIFICATION.md): 21-slide college
-structure filled from these docs; title / Review-1-feedback slides marked `REQUIRES STUDENT INPUT`
-and left blank.
+See [REVIEW_2_PROJECT_SPECIFICATION.md](REVIEW_2_PROJECT_SPECIFICATION.md) (the 21-row mapping of
+each slide to its evidence source) and
+[REVIEW_2_SLIDE_OUTLINE.md](REVIEW_2_SLIDE_OUTLINE.md) (the slide-by-slide talking points: 3–5
+measured bullets per slide, a Completed/Tested/In-progress/Yet-to-start status table, a
+**Numbers → command** table so any figure can be reproduced in the viva, and a 14-question honest
+viva Q&A). Title / team / supervisor / Review-1-feedback slides are marked
+`REQUIRES STUDENT INPUT` and left blank; the deck **file** itself is still the student's to build.
 
 ## 18. Exact local run commands
 ```

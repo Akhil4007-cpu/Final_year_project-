@@ -24,7 +24,10 @@ advisory. Full bibliographic URLs and access dates (all **2026-10-17**) are in
 - **Does NOT establish:** a real-time, sensor-free rider score, nor Indian transferability.
   RoadGuard uses none of its crash data (R2).
 
-### 2. Nadimi et al. (2025), *Assessing safety in horizontal curves using surrogate measures*
+### 2. Nadimi, Fathipour & Sheykhfard (2025), *Assessing safety in horizontal curves using
+surrogate safety measures and machine learning* (Scientific Reports; DOI
+10.1038/s41598-025-97384-7 — title/venue/date re-checked against the Crossref record
+2026-10-18)
 - **Question:** can surrogate measures characterise horizontal-curve safety?
 - **Method:** surrogate-measure analysis (behaviour proxies rather than crash counts).
 - **Data:** traffic/surrogate observations (not crash tallies).

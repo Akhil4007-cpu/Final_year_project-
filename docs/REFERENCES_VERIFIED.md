@@ -12,14 +12,26 @@ the page itself. Rule R1 governs this file: nothing is fabricated to look schola
    Highway Administration.
    URL: https://rosap.ntl.bts.gov/view/dot/35716 · list: https://www.fhwa.dot.gov/publications/lists/021.cfm
    Verified: real FHWA report; quantifies safety effects of horizontal/vertical alignment
-   combinations. **Used for:** the premise that curve geometry relates to crash *experience*
-   on rural highways. **Does NOT establish:** a rider-facing real-time geometry score, nor
-   transferability to Indian mixed-traffic roads.
+   combinations. **Re-checked at the publisher record (ROSA P, National Transportation
+   Library, 2026-10-18): the record reads title "Safety effects of horizontal curve and
+   grade combinations on rural two-lane highways", report no. FHWA-HRT-13-077, authors
+   Karin M. Bauer, Douglas W. Harwood et al., date 2014-01-01.** **Used for:** the premise
+   that curve geometry relates to crash *experience* on rural highways. **Does NOT
+   establish:** a rider-facing real-time geometry score, nor transferability to Indian
+   mixed-traffic roads.
 
-2. **Nadimi, N., et al. (2025).** *Assessing safety in horizontal curves using surrogate
-   measures.* Scientific Reports.
-   URL: https://www.nature.com/articles/s41598-025-97384-7
-   Verified: exists, 2025, ~11 citations. **Used for:** surrogate-measure framing (behaviour
+2. **Nadimi, N., Fathipour, H., & Sheykhfard, A. (2025).** *Assessing safety in horizontal
+   curves using surrogate safety measures and machine learning.* Scientific Reports.
+   URL: https://www.nature.com/articles/s41598-025-97384-7 ·
+   DOI: https://doi.org/10.1038/s41598-025-97384-7
+   Verified: exists, 2025, ~11 citations. **Re-checked at the publisher registry (Crossref,
+   2026-10-18): DOI 10.1038/s41598-025-97384-7, type journal-article, container
+   *Scientific Reports*, published 2025-04-11, authors Navid Nadimi, Hojjat Fathipour,
+   Abbas Sheykhfard — matching the title used here.** Caveat kept honest: the
+   nature.com landing page could **not** be machine-read in this session (the automated
+   fetch got HTTP 303 → a 404 interstitial, i.e. bot protection), so the DOI record and
+   two independent citing works are the verification, not a read of the article HTML.
+   **Used for:** surrogate-measure framing (behaviour
    proxies, not raw crash counts). **Does NOT establish:** that a polyline-only score without
    onboard sensors predicts crashes.
 

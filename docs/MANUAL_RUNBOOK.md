@@ -13,13 +13,17 @@ unless it actually ran.
 pip install -r requirements-dev.txt
 cp .env.example .env          # edit values
 uvicorn app.main:app --reload # rider app at /, admin at /admin, docs at /docs
-python -m pytest -q           # 105 backend tests — verified passing
-node --test "tests/js/**/*.test.js"  # 23 frontend unit tests — verified passing
+python -m pytest -q           # 112 backend tests — verified passing 2026-10-18
+node --test "tests/js/**/*.test.js"  # 31 frontend unit tests — verified passing
 
 # Rider-app E2E (Playwright, headless Chromium; providers are MOCKED/labelled `mock`):
 npm ci                        # installs the one dev-only dep (@playwright/test)
 npx playwright install chromium   # first run only (downloads the browser)
-npx playwright test           # 7 cases — boots the real ASGI app via the config's webServer
+npx playwright test           # 17 cases (10 rider + 5 admin + 2 screenshot) — boots the real
+                              # ASGI app via the config's webServer; tiles are stubbed too
+
+# Live real-route plausibility probe (OPT-IN, network, NOT an accuracy test, never in CI):
+python scripts/real_route_check.py --confirm   # -> docs/real_route_check.json
 
 # Performance benchmarks (see PERFORMANCE_REPORT.md):
 python scripts/bench_server.py                 # offline analyze latency/throughput + scoring before/after
@@ -118,9 +122,10 @@ liveness probes (no PII).
 
 `.github/workflows/ci.yml` has four jobs: **`test`** (Python 3.12) runs ruff → mypy →
 pip-audit → pytest → compliance — all **blocking** (no `continue-on-error`; each is verified
-clean locally); **`frontend-test`** (Node 24) runs the 23 `node --test` cases; **`e2e`**
+clean locally); **`frontend-test`** (Node 24) runs the 31 `node --test` cases; **`e2e`**
 (Node 24 + Python 3.12) runs `npm ci` + `npx playwright install --with-deps chromium` then
-`npx playwright test` (7 rider cases with mock-labelled providers); **`build`**
+`npx playwright test` (17 cases — 10 rider + 5 admin + 2 screenshot — with mock-labelled
+providers and stubbed tiles); **`build`**
 (`needs: [test, e2e]`) runs `docker build`. **Caveat:** this workflow has not yet been executed
 on a GitHub runner, and `docker build` is not verified here (no running engine — KNOWN_ISSUES
 #11). The individual commands it chains are all reproduced green locally except `docker build`.

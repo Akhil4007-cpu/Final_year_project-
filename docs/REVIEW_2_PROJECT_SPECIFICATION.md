@@ -5,6 +5,11 @@ this repository's verified evidence. Rows the code cannot supply are marked
 `REQUIRES STUDENT INPUT` and left blank rather than invented (R11). Every number below
 traces to a doc or `eval_results.json` in this repo.
 
+> **The speaker-facing version of this table is
+> [REVIEW_2_SLIDE_OUTLINE.md](REVIEW_2_SLIDE_OUTLINE.md)** — 3–5 bullets per slide, the viva Q&A,
+> and a Numbers → command table. This file stays the evidence mapping; the outline stays in sync
+> with the artifacts (both refreshed 2026-10-18).
+
 | # | Slide | Content (from repo) | Source | Status |
 |---|---|---|---|---|
 | 1 | Title (team, supervisor) | **REQUIRES STUDENT INPUT** — names, roll numbers, guide | — | ☐ student |
@@ -21,13 +26,13 @@ traces to a doc or `eval_results.json` in this repo.
 | 12 | Dataset / synthetic method | generator_v1, label_v1, seed 42, 1180 rows, 7 scenario types, SHA-256 `5e92447a…d5db9d`, leakage audited. **No real crash/GPS data.** | DATA_AND_PROVENANCE, dataset_manifest | ☑ |
 | 13 | Tools & technologies | FastAPI (API), Pydantic v2 (strict schemas), SQLite WAL (store), scikit-learn HGB (model, monotonic_cst), joblib (artifact), Leaflet 1.9.4 vendored (map), OSM/OSRM/Nominatim (providers), pytest (tests). | requirements.txt | ☑ |
 | 14 | Baseline approach | `physics_v2r_v1`/`label_v1`; clean MAE 0.089; degraded MAE 27.826 — the bar ML must clear. | baseline.py, eval_results | ☑ Tested |
-| 15 | Implementation progress | 99 backend + 23 frontend `node --test` cases green; rider UI (incl. staged capability-aware alerts + settings) and admin console browser-verified; ML reproducible + multi-seed verified; `ruff`/`mypy`/`pip-audit` run clean (CI-blocking); performance measured + optimised (server batch ~6× faster, client 0.024 ms/fix, live provider latency). Playwright E2E / Docker build still pending. | IMPLEMENTATION_STATUS, PERFORMANCE_REPORT | ☑ |
-| 16 | Preliminary results (measured only) | Clean **R² 0.9948** (MAE 0.573) / degraded MAE 14.142 vs baseline 27.826; OOD-radius 14.994 vs baseline 43.287; **hairpin OOD model 20.307 vs baseline 12.647 → fallback**; conformal coverage 0.8403 (seed 42; mean±CI across 5 seeds in `multi_seed_metrics.json`); inference p50 5.02 ms. | GEOMETRY_ML_DESIGN, PERFORMANCE_REPORT | ☑ Measured |
+| 15 | Implementation progress | 112 backend + 31 frontend `node --test` + **17 Playwright E2E** cases green; rider UI (staged capability-aware alerts, settings, speed-aware advisory, route-deviation pause) and admin console driven end-to-end in headless Chromium with `mock` providers; ML reproducible + 5-data-seed verified; `ruff`/`mypy` (31 files)/`pip-audit` run clean and CI-blocking; performance measured + optimised (server batch 9.49×, client 0.024 ms/fix, live provider latency). Open: `docker build` (deferred by student), hosted CI run, in-suite `live` pytest. | IMPLEMENTATION_STATUS, PERFORMANCE_REPORT, LOOP_STATE gate log | ☑ |
+| 16 | Preliminary results (measured only) | Clean **R² 0.9948** (MAE 0.573) / degraded MAE 14.142 vs baseline 27.826; OOD-radius 14.994 vs 43.287; **hairpin OOD model 20.307 vs baseline 12.647 → fallback**; 5-seed degraded **R² 0.3090 (CI 0.2432–0.3747)**; conformal coverage 0.8403 seed-42 / 0.8173 (CI 0.787–0.8476) across 5 seeds; **OOD-type coverage drops to 0.6786**; inference p50 5.02 ms (eval artifact) / 5.27 ms on the 2026-10-18 re-run, p95 5-seed mean 7.39 ms under the 12.0 ms budget. | GEOMETRY_ML_DESIGN, PERFORMANCE_REPORT, multi_seed_metrics | ☑ Measured |
 | 17 | Evaluation strategy | Monotonic grid, noise sweep, missing sweep, OOD type+radius, seed stability, leakage, latency, uncertainty coverage. | §7.5 / GEOMETRY_ML_DESIGN | ☑ |
 | 18 | Current status table | per-feature Completed/Tested/In-progress/Planned/Unverified. | IMPLEMENTATION_STATUS | ☑ |
-| 19 | Remaining work + timeline | restore done; research done; live+E2E tests, lint, audit, client perf, Docker/CI, deck. | LOOP_STATE | ☑ |
+| 19 | Remaining work + timeline | Restore, research, live+E2E tests, lint, audit, client perf all **done**; open: Docker image build (deferred by student), hosted CI, Review 2 deck. | LOOP_STATE | ☑ |
 | 20 | Expected outcome | Defensible geometry advisory with honest uncertainty; **real-world accuracy explicitly "to be evaluated"** — not claimed. | RESEARCH_GAP | ☑ |
-| 21 | References | 11 verified sources + 4 tool families, all URL + access date. | REFERENCES_VERIFIED | ☑ Verified |
+| 21 | References | 11 numbered verified sources + 10 versioned tool entries, all with URL + access date (two publisher re-checks on 2026-10-18). | REFERENCES_VERIFIED | ☑ Verified |
 
 ## Viva-readiness (per guideline 20 questions)
 

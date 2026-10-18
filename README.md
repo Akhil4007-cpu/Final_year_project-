@@ -69,30 +69,36 @@ python -m ml.train --seed 42 --per-type 140
 ```
 
 Reproduces `ml/artifacts/` (`model.joblib`, `eval_results.json`, `MODEL_CARD.md`, dataset
-hash `5e92447a…d5db9d`). See [ml/artifacts/REPRODUCE.md](../ml/artifacts/REPRODUCE.md).
+hash `5e92447a…d5db9d`). See [ml/artifacts/REPRODUCE.md](ml/artifacts/REPRODUCE.md).
 
 ## Test
 
 ```bash
-python -m pytest -q                 # 108 backend tests
+python -m pytest -q                 # 112 backend tests
 node --test "tests/js/**/*.test.js" # 31 frontend unit tests (no build step, Node ≥ 22)
-npx playwright test                 # 15 rider+admin E2E cases (mock-labelled providers; boots the real ASGI app)
+npx playwright test                 # 17 E2E cases (10 rider + 5 admin + 2 screenshot; mock-labelled providers; boots the real ASGI app)
 python -m ruff check app ml scripts tests        # clean
-python -m mypy app ml scripts --ignore-missing-imports  # clean (29 files)
+python -m mypy app ml scripts --ignore-missing-imports  # clean (31 files)
 python -m pip_audit -r requirements.txt          # no known vulnerabilities
+python -m pytest tests/test_compliance.py -q     # 7 R1–R11 string/secret/compliance audits
 python scripts/bench_server.py                   # analyze latency/throughput + scoring before/after (offline)
 python scripts/bench_provider_live.py --confirm  # OPT-IN live Nominatim/OSRM round-trip (needs network)
+python scripts/real_route_check.py --confirm     # OPT-IN live 5-pair plausibility check → docs/real_route_check.json
 ```
 
 Backend: geometry, baseline, aggregation, advisory, security, model, API, DB backup/restore,
-compliance, staged-alert wiring. Frontend unit tests (`tests/js`) cover the pure alert
+compliance, staged-alert wiring, disagreement-fallback audit. Frontend unit tests (`tests/js`) cover the pure alert
 planner + speed-aware advisory note + settings persistence. **Playwright E2E** (`tests/e2e`, `npx playwright test`) drives
-the rider nav state machine, cue playback, trip summary and the insufficient-evidence /
+the rider nav state machine, cue playback, trip summary, route deviation, the speed-aware
+advisory and the insufficient-evidence /
 provider-failure paths, plus the admin console's login/role gating, tab switching, moderation
-and diagnostics — all against the real app with **`mock`-labelled providers** (15 cases); first
+and diagnostics — all against the real app with **`mock`-labelled providers** (17 cases; the
+`screenshots` cases also regenerate the 390 px rider captures in `docs/screenshots/`); first
 run needs `npm ci && npx playwright install chromium`. **`ruff`, `mypy`, and `pip-audit` are run
 clean and are CI-blocking.** Performance is measured (server before/after, live provider, client
-render/soak — see [docs/PERFORMANCE_REPORT.md](docs/PERFORMANCE_REPORT.md)). Remaining: a live
+render/soak — see [docs/PERFORMANCE_REPORT.md](docs/PERFORMANCE_REPORT.md)). The live pipeline is
+additionally sanity-checked on five real Hyderabad pairs — **plausibility only, no accuracy claim**
+([docs/REAL_ROUTE_CHECK.md](docs/REAL_ROUTE_CHECK.md)). Remaining: a live
 `docker build` verification (deferred by student request) — see [docs/LOOP_STATE.md](docs/LOOP_STATE.md).
 
 ## Demo script (happy path)
@@ -102,19 +108,39 @@ render/soak — see [docs/PERFORMANCE_REPORT.md](docs/PERFORMANCE_REPORT.md)). R
 3. OSRM returns up to 3 alternatives; each shows a geometry-challenge score + coverage.
    Comparable-but-close routes return **no recommendation** (honesty over false ranking).
 4. **Start navigation** → advisory card appears with lead time before a tight curve,
-   labelled "Advisory only; based on mapped road shape".
+   labelled "Advisory only; based on mapped road shape". If the device reports a ground
+   speed, the card adds how many g that speed demands on that radius versus the band the
+   score was computed at; if it does not, the card says the assumed band was kept.
+   Leave the analysed polyline and the advisories pause with an off-route note.
 5. **Report hazard** (requires login) → appears as *Community report — unverified*.
 6. `/admin` (admin login) → verify/reject the report; audit records `hazard_verified` /
    `hazard_rejected`.
+
+## Version control
+
+The repository is initialised on `main` with a first commit of the whole tree, then small
+per-task commits. `.gitignore` keeps `.env*` (except `.env.example`), `*.db` / `*.sqlite*`
+(+ WAL/SHM), `.venv`, `node_modules`, `test-results`, `*.pem` / `*.key`, `data/backups/`
+and the scratch `ml/artifacts_debug/` / `ml/artifacts_ml2/` directories out of history.
+
+**Nothing has been pushed — there is no remote.** To publish it yourself, create an empty
+repository (GitHub/GitLab/…) and run, from `D:\FP_ROADGUARD`:
+
+```bash
+git remote add origin <YOUR-REPOSITORY-URL>
+git push -u origin main
+```
 
 ## Documentation
 
 Everything lives in [`docs/`](docs/): PROJECT_AUDIT · ARCHITECTURE · API_SPECIFICATION ·
 DATABASE_DESIGN · SECURITY_AND_PRIVACY · GEOMETRY_ML_DESIGN · GEOMETRY_ML_LIMITATIONS ·
-DATA_AND_PROVENANCE · PERFORMANCE_REPORT · TESTING_AND_EVALUATION · LIMITATIONS ·
-IMPLEMENTATION_STATUS · KNOWN_ISSUES · LOOP_STATE · MANUAL_RUNBOOK ·
+DATA_AND_PROVENANCE · PERFORMANCE_REPORT · TESTING_AND_EVALUATION · REAL_ROUTE_CHECK ·
+LIMITATIONS · IMPLEMENTATION_STATUS · KNOWN_ISSUES · LOOP_STATE · MANUAL_RUNBOOK ·
+FINAL_REPORT · REVIEW_2_PROJECT_SPECIFICATION · REVIEW_2_SLIDE_OUTLINE ·
 RESEARCH_LITERATURE_REVIEW · RESEARCH_GAP_AND_CONTRIBUTION · REFERENCES_VERIFIED ·
-REVIEW_2_PROJECT_SPECIFICATION.
+ROADGUARD_FINAL_MASTER_PLAN (the original brief). Model-level documents are in
+[`ml/artifacts/`](ml/artifacts/): MODEL_CARD · REPRODUCE.
 
 ## Status / honesty
 

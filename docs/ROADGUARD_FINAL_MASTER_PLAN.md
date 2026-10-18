@@ -1,6 +1,8 @@
 # ROADGUARD AI — FINAL MASTER PLAN (END TO END)
 
-Project dir: `D:\Final_year_Project`
+Project dir: `D:\FP_ROADGUARD` (the plan was drafted against `D:\Final_year_Project`; the
+brief required the build be created fresh in `D:\FP_ROADGUARD` without reusing the legacy
+tree, so every path below is relative to `D:\FP_ROADGUARD`)
 B.Tech CSE (DS & ML) final-year project · C R Rao AIMSCS · Major Project Stage 1 → Review 2 → full build
 Supersedes: `ROADGUARD_MASTER_LOOP_PLAN.md` and `ROADGUARD_FEATURES_AND_ML_PLAN_v2.md`
 
@@ -347,6 +349,10 @@ update docs/LOOP_STATE.md with actual commands and outputs. Do not stop to ask u
 blocked on student-only information; log the blocker and continue independent work.
 Stop only when all §14 exit gates are green with evidence, then write the Final Report.
 ```
+
+> §16 is the **historical kickoff text**, quoted verbatim; the `D:\Final_year_Project` path in it
+> is where the plan was drafted. This build lives in `D:\FP_ROADGUARD` (see the header) — do not
+> run the kickoff prompt against the legacy directory.
 
 ---
 
